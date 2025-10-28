@@ -462,11 +462,20 @@
       margin-bottom: 8px;
     }
 
+    .pricing-card-inner {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .pricing-card-content {
+      flex-grow: 1;
+    }
+
     .cta-button {
       display: block;
       width: 100%;
       padding: 14px;
-      margin-top: 24px;
       text-align: center;
       font-weight: 700;
       border-radius: 8px;
@@ -476,6 +485,7 @@
       cursor: pointer;
       transition: all 0.2s ease;
       text-decoration: none;
+      margin-top: auto;
     }
 
     .cta-button:hover {
@@ -526,9 +536,7 @@
       <div class="container nav-row">
         <a class="brand" href="#top"><span class="logo" aria-hidden="true">◆</span>Graphite</a>
         <div class="nav-links">
-          <a href="#overview">Overview</a>
           <a href="#features">Features</a>
-          <a href="#models">Models</a>
           <a href="#pricing">Pricing</a>
           <a class="btn btn-primary" href="#download">Download</a>
         </div>
@@ -846,9 +854,9 @@
     <footer>
       <div>© 2025 Graphite. All rights reserved.</div>
       <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-        <a class="btn">GitHub</a>
-        <a class="btn">Documentation</a>
-        <a class="btn">Contact</a>
+        <a class="btn" href="https://github.com/dovvnloading/Graphite" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn" href="https://github.com/dovvnloading/Graphite-Site/blob/main/Documentation.md" target="_blank" rel="noopener">Docs</a>
+        <a class="btn" href="mailto:dev.graphite@gmail.com">Contact</a>
       </div>
     </footer>
   </main>
