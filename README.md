@@ -5,6 +5,10 @@
 
 **Visit the Website → [https://dovvnloading.github.io/Graphite-Site/](https://dovvnloading.github.io/Graphite-Site/)**
 
+<img width="512" height="512" alt="graphite" src="https://github.com/user-attachments/assets/78066dfe-7f1a-4cba-8f62-ab404d34dea1" />
+
+
+
 </div>
 
 ---
