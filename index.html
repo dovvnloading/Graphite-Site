@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Graphite Pro — The Local AI Workspace</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Graphite Pro is a local-first, privacy-respecting AI workspace with a grid-based, node-graph interface for reasoning, research, and creation." />
+  <style>
+    /* ====== THEME (single-file, HTML only) ====== */
+    :root{
+      --bg:#2A2A2A;             /* deep charcoal */
+      --panel:#404040;          /* metallic graphite */
+      --text:#F1F5F9;           /* cool off-white */
+      --muted:#9CA3AF;          /* muted gray */
+      --emerald:#10B981;        /* accent 1 */
+      --ocean:#0EA5E9;          /* accent 2 */
+      --teal:#06B6D4;           /* accent alt */
+      --radius:14px;
+      --line:rgba(255,255,255,.08);
+      --shadow:0 10px 36px rgba(0,0,0,.45);
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, Helvetica, Arial;
+      background:
+        radial-gradient(1200px 500px at 110% -10%, rgba(16,185,129,.18), transparent 60%),
+        radial-gradient(900px 400px at -10% 10%, rgba(14,165,233,.18), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      line-height:1.6;
+    }
+    a{color:inherit;text-decoration:none}
+    .container{max-width:1120px;margin:0 auto;padding:24px}
+    /* ====== NAV ====== */
+    .nav{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(42,42,42,.9), rgba(42,42,42,.65)); backdrop-filter:saturate(140%) blur(8px)}
+    .nav-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
+    .logo{inline-size:28px;block-size:28px;border-radius:8px;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--emerald),var(--ocean)); color:#0b0e1a; font-weight:900}
+    .nav-links{display:flex;gap:16px;align-items:center;color:var(--muted)}
+    /* ====== HERO ====== */
+    header{position:relative;overflow:hidden}
+    .grid-bg{position:absolute;inset:0;opacity:.15;background-image:
+      linear-gradient(var(--panel) 1px, transparent 1px),
+      linear-gradient(90deg, var(--panel) 1px, transparent 1px);
+      background-size:40px 40px;}
+    .hero{padding:88px 24px 56px; position:relative}
+    .badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid var(--line);
+      background:rgba(255,255,255,.04); color:var(--muted); font-weight:600}
+    h1{font-size:clamp(2.2rem,2.4vw + 1rem,3.25rem); line-height:1.1; margin:10px 0 6px}
+    .lead{max-width:860px;color:var(--muted);font-size:clamp(1rem,.55vw + .95rem,1.15rem)}
+    .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+    .btn{display:inline-block;padding:12px 16px;border-radius:12px;border:1px solid var(--line);
+      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02)); font-weight:700; box-shadow:var(--shadow)}
+    .btn-primary{background:linear-gradient(135deg,var(--emerald),var(--ocean)); color:#0b0f18; border-color:transparent}
+    .btn-ghost{color:var(--muted)}
+    /* ====== PANELS & GRID ====== */
+    .panel{background:rgba(64,64,64,.85); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px}
+    .two{display:grid;grid-template-columns:1.1fr .9fr; gap:24px; align-items:stretch}
+    .cards{display:grid;grid-template-columns:repeat(3,1fr); gap:16px}
+    h2{font-size:1.9rem;margin:0 0 12px;color:var(--ocean)}
+    h3{margin:.2rem 0 .4rem;color:var(--emerald)}
+    .muted{color:var(--muted)}
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr); gap:10px;margin-top:12px}
+    .k{border:1px solid var(--line); border-radius:12px; text-align:center; padding:12px; background:rgba(255,255,255,.03)}
+    .k .n{font-weight:900}
+    /* ====== DETAILS/ACCORDIONS (HTML-only interactivity) ====== */
+    details{border:1px solid var(--line); border-radius:12px; padding:14px 16px; background:rgba(255,255,255,.03)}
+    details + details{margin-top:10px}
+    summary{font-weight:700; cursor:pointer}
+    /* ====== TABLES ====== */
+    table{width:100%;border-collapse:collapse;border:1px solid var(--line); border-radius:12px; overflow:hidden}
+    th,td{padding:12px 10px;border-bottom:1px solid var(--line); text-align:left; vertical-align:top}
+    th{background:rgba(255,255,255,.04); color:var(--ocean)}
+    td:first-child{font-weight:700}
+    /* ====== FOOTER ====== */
+    footer{border-top:1px solid var(--line); color:var(--muted)}
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 980px){
+      .nav-links{display:none}
+      .two{grid-template-columns:1fr}
+      .cards{grid-template-columns:1fr}
+      .kpis{grid-template-columns:repeat(2,1fr)}
+    }
+  </style>
+</head>
+<body>
+  <!-- NAV -->
+  <nav class="nav" aria-label="Primary">
+    <div class="container nav-row">
+      <a class="brand" href="#top"><span class="logo" aria-hidden="true">◆</span>Graphite</a>
+      <div class="nav-links">
+        <a href="#overview">Overview</a>
+        <a href="#features">Features</a>
+        <a href="#models">Models</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#faq">FAQ</a>
+        <a class="btn btn-primary" href="#download">Get Graphite</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header id="top">
+    <div class="grid-bg" aria-hidden="true"></div>
+    <div class="container hero">
+      <span class="badge">Local-first • Private • Multi-model • Node-graph UI</span>
+      <h1>The AI workspace for builders — visual, private, extensible.</h1>
+      <p class="lead">
+        Graphite Pro transforms linear chat into a <strong>visual reasoning canvas</strong>. Connect
+        <strong>Ollama</strong> for local models or use <strong>OpenAI, Anthropic, Gemini,</strong> and <strong>Groq</strong> via API — all in one node-based interface
+        designed for research, creation, and complex thinking.
+      </p>
+      <div class="cta" role="group" aria-label="Primary actions">
+        <a class="btn btn-primary" href="#download">Download Free Trial</a>
+        <a class="btn btn-ghost" href="#pricing">View Plans</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- OVERVIEW -->
+  <section id="overview" class="container" style="padding:48px 24px">
+    <div class="two">
+      <div class="panel">
+        <h2>Overview</h2>
+        <p class="muted">
+          Graphite Pro is a secure, local-first AI workspace that merges human intuition with model intelligence. It replaces linear chat
+          with a <em>node-graph</em> canvas, so you can branch ideas, compare approaches, and keep an auditable trail of how you think.
+          The result is a workflow that’s faster to explore, easier to explain, and fundamentally more creative — all while keeping your
+          data on your machine.
+        </p>
+        <div class="kpis">
+          <div class="k"><div class="n">5-day</div><div class="muted">Full trial</div></div>
+          <div class="k"><div class="n">∞</div><div class="muted">Canvas branches</div></div>
+          <div class="k"><div class="n">0</div><div class="muted">Telemetry</div></div>
+          <div class="k"><div class="n">1</div><div class="muted">Unified UI</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Why it’s different</h2>
+        <ul class="muted" style="margin:.4rem 0 0 1rem">
+          <li><strong>Visual reasoning:</strong> node-based thinking beats scrollback.</li>
+          <li><strong>Local privacy:</strong> run powerful models with Ollama, offline.</li>
+          <li><strong>Provider-agnostic:</strong> switch between OpenAI, Anthropic, Gemini, Groq, or any OAI-compatible endpoint.</li>
+          <li><strong>Extensible:</strong> plugin-ready architecture for RAG, code tools, and visualization.</li>
+          <li><strong>Durable sessions:</strong> save projects as searchable knowledge graphs.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="container" style="padding:12px 24px 48px">
+    <h2>Core Features</h2>
+    <div class="cards">
+      <div class="panel">
+        <h3>Graph Workspace</h3>
+        <p class="muted">Branch, fork, and connect thoughts. Compare outputs side-by-side and preserve a transparent trail of decisions.</p>
+      </div>
+      <div class="panel">
+        <h3>Local-First Privacy</h3>
+        <p class="muted">Your data stays on your device. No accounts, no tracking, no background network calls — ever.</p>
+      </div>
+      <div class="panel">
+        <h3>Multi-Model Router</h3>
+        <p class="muted">Ollama (local), OpenAI, Anthropic, Gemini, Groq, and other OAI-compatible providers — all behind one clean interface.</p>
+      </div>
+      <div class="panel">
+        <h3>Plugin Ecosystem</h3>
+        <p class="muted">Extend Graphite with RAG for local docs, charting & visualization, code execution nodes, and more.</p>
+      </div>
+      <div class="panel">
+        <h3>Session Memory</h3>
+        <p class="muted">Persist entire sessions as knowledge graphs. Revisit, search, and evolve your work over time.</p>
+      </div>
+      <div class="panel">
+        <h3>Offline Licensing</h3>
+        <p class="muted">Activate once. No online checks required. Designed for reliability and independence.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODELS -->
+  <section id="models" class="container" style="padding:12px 24px 48px">
+    <h2>Models & Providers</h2>
+    <p class="muted">Choose local models with Ollama or connect APIs for frontier capabilities. Graphite routes everything through a consistent interface.</p>
+    <div class="cards">
+      <div class="panel"><strong>Ollama (Local)</strong><br><span class="muted">Fully offline, privacy-first.</span></div>
+      <div class="panel"><strong>OpenAI</strong><br><span class="muted">GPT-class models via API.</span></div>
+      <div class="panel"><strong>Anthropic</strong><br><span class="muted">Claude-series reasoning.</span></div>
+      <div class="panel"><strong>Gemini</strong><br><span class="muted">Multimodal capabilities.</span></div>
+      <div class="panel"><strong>Groq</strong><br><span class="muted">High-speed inference.</span></div>
+      <div class="panel"><strong>OpenAI-compatible</strong><br><span class="muted">OpenRouter & self-hosted.</span></div>
+    </div>
+  </section>
+
+  <!-- LICENSING / PRICING -->
+  <section id="pricing" class="container" style="padding:12px 24px 48px">
+    <h2>Licensing & Pricing</h2>
+    <p class="muted">Graphite remains open in spirit and community-driven. Subscriptions fund ongoing development, plugins, and support.</p>
+    <div class="panel" style="margin-top:12px">
+      <table aria-label="Free versus Pro comparison">
+        <thead>
+          <tr><th>Feature</th><th>Free (Trial)</th><th>Pro</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Access Duration</td><td>5 days (full features)</td><td>Unlimited</td></tr>
+          <tr><td>Local Privacy (Ollama)</td><td>Yes</td><td>Yes</td></tr>
+          <tr><td>External API Providers</td><td>Limited to one</td><td>All supported providers</td></tr>
+          <tr><td>Persistent Projects & Memory</td><td>No (temp only)</td><td>Yes (save & search)</td></tr>
+          <tr><td>Plugins</td><td>No</td><td>Full access</td></tr>
+          <tr><td>Updates Channel</td><td>Manual</td><td>Priority / early access</td></tr>
+          <tr><td>Support</td><td>Community</td><td>Direct developer support</td></tr>
+          <tr><td>Team / Lab Licensing</td><td>No</td><td>Available on request</td></tr>
+        </tbody>
+      </table>
+      <div class="two" style="margin-top:16px">
+        <div class="panel">
+          <h3>Pricing</h3>
+          <p class="muted" style="margin:.2rem 0 0">Monthly: <strong>$6–8</strong> • Annual: <strong>$60–70</strong> (≈2 months free)</p>
+          <p class="muted">Founders License (limited): <strong>$99</strong> lifetime updates.</p>
+        </div>
+        <div class="panel">
+          <h3>Licensing Philosophy</h3>
+          <p class="muted">The Free trial ensures access. Pro sustains velocity: updates, plugins, and fast bug-fixes — while keeping the project independent and privacy-respecting.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section id="roadmap" class="container" style="padding:12px 24px 48px">
+    <h2>Roadmap</h2>
+    <div class="panel">
+      <details open>
+        <summary>v0.3.x — Productization & Licensing</summary>
+        <p class="muted">EULA, 5-day trial, offline activation, About dialog, credits, licensing status in title bar.</p>
+      </details>
+      <details>
+        <summary>v0.4.x — Plugin SDK</summary>
+        <p class="muted">RAG for local docs, charting/visualizers, code execution nodes, plugin manager UI.</p>
+      </details>
+      <details>
+        <summary>v0.5.x — Multi-Model Arena</summary>
+        <p class="muted">Parallel prompts, scoring, meta-judge node, side-by-side comparisons.</p>
+      </details>
+      <details>
+        <summary>v1.0 — Collaboration</summary>
+        <p class="muted">Real-time shared canvases, presence indicators, exportable project graphs.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="container" style="padding:12px 24px 64px">
+    <h2>FAQ</h2>
+    <div class="panel">
+      <details open>
+        <summary>Is Graphite open-source?</summary>
+        <p class="muted">The code is public and community-driven. A lightweight license + trial keeps development sustainable while preserving the open ethos.</p>
+      </details>
+      <details>
+        <summary>Do you collect data?</summary>
+        <p class="muted"><strong>No telemetry.</strong> Local models run on your machine. API usage remains between you and your provider.</p>
+      </details>
+      <details>
+        <summary>How does licensing work?</summary>
+        <p class="muted">Install → 5-day full-feature trial → activate with a key in-app. Keys are validated locally; no always-online checks.</p>
+      </details>
+      <details>
+        <summary>Which models are supported?</summary>
+        <p class="muted">Ollama (local), plus APIs for OpenAI, Anthropic, Gemini, Groq, and other OpenAI-compatible endpoints.</p>
+      </details>
+      <details>
+        <summary>Can I contribute?</summary>
+        <p class="muted">Yes. PRs are welcome. Early adopters help shape plugins, UX, and roadmap priorities.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section id="download" class="container" style="padding:0 24px 72px">
+    <h2>Download</h2>
+    <div class="cards">
+      <div class="panel">
+        <h3>Windows</h3>
+        <p class="muted">64-bit • Windows 10/11</p>
+        <p><a class="btn btn-primary" href="https://github.com/YOUR_USER/YOUR_REPO/releases/latest" target="_blank" rel="noopener">Download .exe</a></p>
+      </div>
+      <div class="panel">
+        <h3>macOS</h3>
+        <p class="muted">Universal build planned • Community testers welcome</p>
+        <p><span class="btn" aria-disabled="true">Coming soon</span></p>
+      </div>
+      <div class="panel">
+        <h3>Linux</h3>
+        <p class="muted">AppImage/Flatpak under consideration • Python source available</p>
+        <p><a class="btn" href="https://github.com/YOUR_USER/YOUR_REPO" target="_blank" rel="noopener">Build from source</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container" style="padding:32px 24px; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap">
+      <div>© <span id="year">2025</span> Graphite. All rights reserved.</div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <a class="btn" href="https://github.com/YOUR_USER/YOUR_REPO" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn" href="#pricing">Plans</a>
+        <a class="btn" href="#faq">FAQ</a>
+        <a class="btn" href="mailto:you@example.com">Contact</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
