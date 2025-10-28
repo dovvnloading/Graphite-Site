@@ -364,6 +364,135 @@
       border-bottom: none;
     }
 
+    /* ====== PRICING CARDS ====== */
+    .pricing-card {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: rgba(36, 36, 36, 0.4);
+      backdrop-filter: blur(8px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .pricing-header {
+      padding: 28px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .pricing-price {
+      font-size: 2.2rem;
+      font-weight: 900;
+      margin: 0 0 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .pricing-period {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .pricing-badge {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-orange);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .pricing-badge.community {
+      background: rgba(168, 85, 247, 0.15);
+      color: var(--node-analysis);
+    }
+
+    .pricing-details {
+      padding: 0;
+    }
+
+    details.pricing-details {
+      border: none;
+      padding: 0;
+      background: none;
+    }
+
+    .pricing-details summary {
+      padding: 16px 28px;
+      cursor: pointer;
+      font-weight: 600;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text);
+      user-select: none;
+      transition: background 0.2s ease;
+    }
+
+    .pricing-details summary:hover {
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .pricing-details summary::after {
+      content: '▼';
+      font-size: 0.8rem;
+      transition: transform 0.2s ease;
+      color: var(--text-muted);
+    }
+
+    .pricing-details[open] summary::after {
+      transform: rotate(180deg);
+    }
+
+    .pricing-details-content {
+      padding: 0 28px 24px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.8;
+    }
+
+    .pricing-details-content ul {
+      margin: 12px 0 0;
+      padding-left: 20px;
+      list-style-type: disc;
+    }
+
+    .pricing-details-content li {
+      margin-bottom: 8px;
+    }
+
+    .cta-button {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      margin-top: 24px;
+      text-align: center;
+      font-weight: 700;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .cta-button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .cta-button.primary {
+      background: linear-gradient(135deg, var(--node-query), var(--node-response));
+      color: #0b0e1a;
+      border-color: transparent;
+    }
+
+    .cta-button.primary:hover {
+      background: linear-gradient(135deg, #059669, #0284c7);
+    }
+
     /* ====== FOOTER ====== */
     footer {
       border-top: 1px solid var(--line);
@@ -520,72 +649,174 @@
     <!-- PRICING -->
     <section id="pricing" class="container">
       <h2>Licensing & Pricing</h2>
-      <p class="lead" style="max-width: 100%; margin-bottom: 32px;">
-        Free 5-day trial with full features. Pro subscriptions sustain development, plugins, support, and independence.
+      <p class="lead" style="max-width: 100%; margin-bottom: 48px;">
+        Free 5-day trial with full features. Pro subscriptions sustain development, plugins, support, and the independence of this project.
       </p>
-      <table class="pricing-table">
-        <thead>
-          <tr>
-            <th>Feature</th>
-            <th>Free (Trial)</th>
-            <th>Pro</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Duration</td>
-            <td>5 days (full features)</td>
-            <td>Unlimited</td>
-          </tr>
-          <tr>
-            <td>Local Models (Ollama)</td>
-            <td>Yes</td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>External API Providers</td>
-            <td>Limited (1 provider)</td>
-            <td>All supported</td>
-          </tr>
-          <tr>
-            <td>Persistent Projects</td>
-            <td>—</td>
-            <td>Yes (save & search)</td>
-          </tr>
-          <tr>
-            <td>Plugin Ecosystem</td>
-            <td>—</td>
-            <td>Full access</td>
-          </tr>
-          <tr>
-            <td>Priority Updates</td>
-            <td>—</td>
-            <td>Yes</td>
-          </tr>
-          <tr>
-            <td>Developer Support</td>
-            <td>Community</td>
-            <td>Direct support</td>
-          </tr>
-        </tbody>
-      </table>
 
-      <div class="grid-3" style="margin-top: 40px;">
-        <div class="card">
-          <h3>Pro Monthly</h3>
-          <p style="font-size: 1.5rem; color: var(--node-response); margin-bottom: 8px; font-weight: 700;">$6–8</p>
-          <p>Billed monthly. Cancel anytime.</p>
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; margin-bottom: 60px;">
+        
+        <!-- Free Trial Card -->
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3 style="margin: 0 0 12px; color: var(--text);">Free Trial</h3>
+            <div class="pricing-price">5 days</div>
+            <div class="pricing-period">Full features, no credit card</div>
+          </div>
+          <div class="pricing-details">
+            <details class="pricing-details" open>
+              <summary>What's included</summary>
+              <div class="pricing-details-content">
+                <ul>
+                  <li>Complete node-graph canvas with infinite branching</li>
+                  <li>Local models via Ollama (fully private)</li>
+                  <li>One external API provider (OpenAI, Anthropic, etc.)</li>
+                  <li>Frames, notes, and navigation pins</li>
+                  <li>Temporary session storage (not saved)</li>
+                  <li>Full access to all core features</li>
+                </ul>
+              </div>
+            </details>
+          </div>
+          <a href="#download" class="cta-button">Start Free Trial</a>
         </div>
-        <div class="card">
-          <h3>Pro Annual</h3>
-          <p style="font-size: 1.5rem; color: var(--node-query); margin-bottom: 8px; font-weight: 700;">$60–70</p>
-          <p>Save 2 months versus monthly billing.</p>
+
+        <!-- Pro Monthly Card -->
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3 style="margin: 0 0 12px; color: var(--node-response);">Pro Monthly</h3>
+            <div class="pricing-price" style="color: var(--node-response);">$8</div>
+            <div class="pricing-period">Billed monthly, cancel anytime</div>
+          </div>
+          <div class="pricing-details">
+            <details class="pricing-details" open>
+              <summary>Everything in Free, plus:</summary>
+              <div class="pricing-details-content">
+                <ul>
+                  <li>Unlimited access—no expiration</li>
+                  <li>All API providers supported simultaneously</li>
+                  <li>Persistent project storage and search</li>
+                  <li>Full plugin ecosystem access</li>
+                  <li>Priority bug fixes and updates</li>
+                  <li>Direct developer support via email</li>
+                  <li>Early access to new features</li>
+                </ul>
+              </div>
+            </details>
+          </div>
+          <a href="#download" class="cta-button primary">Upgrade to Pro</a>
         </div>
-        <div class="card">
-          <h3>Founders License</h3>
-          <p style="font-size: 1.5rem; color: var(--accent-orange); margin-bottom: 8px; font-weight: 700;">$99</p>
-          <p>Lifetime updates (limited availability).</p>
+
+        <!-- Pro Annual Card -->
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <h3 style="margin: 0 0 12px; color: var(--node-query);">Pro Annual</h3>
+            <div class="pricing-price" style="color: var(--node-query);">$65</div>
+            <div class="pricing-period">$5.42/month, save 2 months</div>
+          </div>
+          <div class="pricing-details">
+            <details class="pricing-details" open>
+              <summary>All Pro Monthly benefits</summary>
+              <div class="pricing-details-content">
+                <p>Same unlimited access and support as monthly, with a discounted annual rate. Renews automatically—cancel anytime before renewal.</p>
+              </div>
+            </details>
+          </div>
+          <a href="#download" class="cta-button primary">Choose Annual</a>
         </div>
+
+        <!-- Founders License Card -->
+        <div class="pricing-card" style="border-color: var(--accent-orange); border-width: 2px;">
+          <div class="pricing-header" style="background: rgba(245, 158, 11, 0.08);">
+            <h3 style="margin: 0 0 12px; color: var(--accent-orange);">Founders License</h3>
+            <div class="pricing-price" style="color: var(--accent-orange);">$99</div>
+            <div class="pricing-period">One-time payment, lifetime updates</div>
+            <span class="pricing-badge community">Limited availability</span>
+          </div>
+          <div class="pricing-details">
+            <details class="pricing-details" open>
+              <summary>All Pro features, plus exclusive perks</summary>
+              <div class="pricing-details-content">
+                <ul>
+                  <li>Lifetime updates and access—never expires</li>
+                  <li>Exclusive "Founder" community badge in roadmap discussions</li>
+                  <li>Priority consideration for feature requests</li>
+                  <li>Direct line to developer for insights and strategic input</li>
+                  <li>Earliest access to beta features before public release</li>
+                  <li>Recognition in project credits and GitHub contributors</li>
+                  <li>Special pricing on future Graphite products</li>
+                </ul>
+                <p style="margin-top: 16px; color: var(--accent-orange); font-weight: 600;">Only 50 licenses available.</p>
+              </div>
+            </details>
+          </div>
+          <a href="#download" class="cta-button" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.2)); border-color: var(--accent-orange); color: var(--accent-orange);">Claim Founders License</a>
+        </div>
+
+      </div>
+
+      <!-- Comparison Table -->
+      <div style="margin-top: 60px;">
+        <h3 style="margin-bottom: 20px; text-align: center;">Feature Comparison</h3>
+        <table class="pricing-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Free Trial</th>
+              <th>Pro</th>
+              <th>Founders</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Duration</td>
+              <td>5 days</td>
+              <td>Unlimited</td>
+              <td>Lifetime</td>
+            </tr>
+            <tr>
+              <td>Local Models (Ollama)</td>
+              <td>Yes</td>
+              <td>Yes</td>
+              <td>Yes</td>
+            </tr>
+            <tr>
+              <td>External API Providers</td>
+              <td>1 provider</td>
+              <td>All supported</td>
+              <td>All supported</td>
+            </tr>
+            <tr>
+              <td>Persistent Projects</td>
+              <td>—</td>
+              <td>Yes</td>
+              <td>Yes</td>
+            </tr>
+            <tr>
+              <td>Plugin Ecosystem</td>
+              <td>—</td>
+              <td>Full access</td>
+              <td>Full access</td>
+            </tr>
+            <tr>
+              <td>Developer Support</td>
+              <td>Community</td>
+              <td>Email support</td>
+              <td>Direct + strategic input</td>
+            </tr>
+            <tr>
+              <td>Community Badge</td>
+              <td>—</td>
+              <td>—</td>
+              <td>Exclusive badge</td>
+            </tr>
+            <tr>
+              <td>Beta Access</td>
+              <td>—</td>
+              <td>Early access</td>
+              <td>Earliest access</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
 
