@@ -403,6 +403,67 @@
       border-color: rgba(255, 255, 255, 0.15);
     }
 
+    /* ====== DETAILED FEATURES LIST ====== */
+    .features-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 40px;
+    }
+
+    .feature-item {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(36, 36, 36, 0.2);
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+    }
+
+    .feature-item:hover {
+      background: rgba(36, 36, 36, 0.4);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-4px);
+    }
+
+    .feature-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .feature-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+
+    .feature-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .feature-category {
+      margin-top: 60px;
+    }
+
+    .feature-category h3 {
+      font-size: 1.3rem;
+      color: var(--node-query);
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
     /* ====== PRICING TABLE ====== */
     .pricing-table {
       width: 100%;
@@ -636,8 +697,6 @@
       </div>
     </header>
 
-
-
     <!-- OVERVIEW -->
     <section id="overview" class="container">
       <h2>Why Graphite?</h2>
@@ -669,8 +728,454 @@
       </div>
     </section>
 
-    <!-- FEATURES IN DEPTH -->
+    <!-- DETAILED FEATURES LIST -->
     <section id="features" class="container">
+      <h2>Complete Feature List</h2>
+
+      <!-- Canvas & Navigation -->
+      <div class="feature-category">
+        <h3>📋 Canvas & Navigation</h3>
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🎨</span>
+              Node-Graph Canvas
+            </div>
+            <div class="feature-desc">Organize reasoning spatially. Branch paths, fork decisions, and maintain clarity about how you arrived at conclusions.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🖱️</span>
+              Intuitive Navigation
+            </div>
+            <div class="feature-desc">Pan with middle-mouse, zoom with Ctrl+scroll, area zoom with Shift+drag. Rubber-band selection and multi-item manipulation.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📌</span>
+              Frames & Grouping
+            </div>
+            <div class="feature-desc">Group multiple nodes into movable containers. Resize, lock, customize with colors and notes for organization.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📍</span>
+              Navigation Pins
+            </div>
+            <div class="feature-desc">Bookmark specific canvas locations. Name, annotate, and jump to saved positions across your workspace.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">✏️</span>
+              Sticky Notes
+            </div>
+            <div class="feature-desc">Floating annotations with rich-text editing. Resizable and color-customizable for visual organization.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🔲</span>
+              Smart Grid System
+            </div>
+            <div class="feature-desc">Dynamic, zoom-responsive grid with customizable opacity and size. Optional snap-to-grid and smart alignment guides.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content & Nodes -->
+      <div class="feature-category">
+        <h3>💬 Content & Nodes</h3>
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">💬</span>
+              Chat Nodes
+            </div>
+            <div class="feature-desc">Multi-modal support with formatted text (Markdown) and images. Scrollable content, collapsible headers, and contextual parent relationships.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">{"}</span>
+              Code Nodes
+            </div>
+            <div class="feature-desc">Syntax highlighting with automatic language detection. Copy-code button, parent linking, and full code exploration.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📄</span>
+              Document Nodes
+            </div>
+            <div class="feature-desc">Display attached file content with scrollable viewing. Automatic text extraction from supported formats.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🎯</span>
+              Contextual Branching
+            </div>
+            <div class="feature-desc">Generate multiple responses from any point in the conversation. Create exploratory branches and compare approaches effortlessly.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🔄</span>
+              Response Regeneration
+            </div>
+            <div class="feature-desc">Request new AI responses for any prompt. Replace existing nodes and explore alternative reasoning paths.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📎</span>
+              Multi-Modal Input
+            </div>
+            <div class="feature-desc">Include images in prompts for models that support vision. Seamless image attachment via drag-and-drop or file picker.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Connections & Paths -->
+      <div class="feature-category">
+        <h3>🔗 Connections & Relationships</h3>
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">➡️</span>
+              Conversation Flow
+            </div>
+            <div class="feature-desc">Visualize chronological and logical conversation branches. Color-graded lines with pulsing arrow animations on hover.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🎚️</span>
+              Custom Path Routing
+            </div>
+            <div class="feature-desc">Add pins to connections with Ctrl+Left-Click to create bezier curve control points. Move or remove pins for precise path customization.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🔗</span>
+              Content Links
+            </div>
+            <div class="feature-desc">Visualize relationships between chat nodes and generated code or document nodes with distinctive dashed styling.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">⭐</span>
+              System Prompt Links
+            </div>
+            <div class="feature-desc">Special pulsing connections linking system prompt notes to conversation branches for custom AI behavior.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📐</span>
+              Orthogonal Routing
+            </div>
+            <div class="feature-desc">Automatic right-angle path routing for connections. Keeps your canvas organized and easier to follow.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI & Analysis -->
+      <div class="feature-category">
+        <h3>🤖 AI & Content Analysis</h3>
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">💡</span>
+              Multi-Provider Support
+            </div>
+            <div class="feature-desc">Run the same workflow across OpenAI, Anthropic, Gemini, Groq, Ollama, or any OpenAI-compatible endpoint.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📊</span>
+              AI Chart Generation
+            </div>
+            <div class="feature-desc">Analyze text content and auto-generate charts. Supports bar, line, pie, histogram, and Sankey diagrams.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🎨</span>
+              Image Generation
+            </div>
+            <div class="feature-desc">Generate images from text prompts using Gemini's imagen model. Results appear as new chat nodes.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📌</span>
+              Generate Takeaway
+            </div>
+            <div class="feature-desc">Create concise summaries of any node's content as searchable sticky notes.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📚</span>
+              Generate Explainer
+            </div>
+            <div class="feature-desc">Generate simplified, high-level explanations of complex content as standalone notes.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🎭</span>
+              System Prompt Customization
+            </div>
+            <div class="feature-desc">Override default system prompts for entire branches. Enable role-based AI behavior like code review or writing coaching.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- File & Content Handling -->
+      <div class="feature-category">
+        <h3>📁 File & Content Handling</h3>
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📤</span>
+              File Attachment
+            </div>
+            <div class="feature-desc">Attach files via dedicated button or drag-and-drop. Automatic parsing and visualization in document nodes.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🖼️</span>
+              Image Support
+            </div>
+            <div class="feature-desc">PNG, JPG, JPEG, WebP formats for multi-modal AI prompting and inline visualization.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📋</span>
+              Document Formats
+            </div>
+            <div class="feature-desc">TXT, MD, PY, JSON, HTML, CSS, JS, CSV, XML, PDF, DOCX. Automatic text extraction and proper formatting.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🔍</span>
+              Full-Text Search
+            </div>
+            <div class="feature-desc">Find text across any node on the canvas. Navigate with next/previous buttons for comprehensive content discovery.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">✅</span>
+              Spell Checking
+            </div>
+            <div class="feature-desc">Built-in spell check in the main text input field with context menu suggestions.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Session & Knowledge -->
+      <div class="feature-category">
+        <h3>💾 Session & Knowledge Management</h3>
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📚</span>
+              Chat Library
+            </div>
+            <div class="feature-desc">Central dialog for managing all saved sessions. Load, delete, rename, and search by title with Ctrl+L.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">💾</span>
+              Manual Save
+            </div>
+            <div class="feature-desc">Save entire canvas state to local SQLite database with Ctrl+S. Complete state preservation including zoom and scroll position.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🗂️</span>
+              Persistent Projects
+            </div>
+            <div class="feature-desc">All nodes, connections, frames, notes, pins, and charts are saved. Revisit and build on past work indefinitely.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🏷️</span>
+              Automatic Titling
+            </div>
+            <div class="feature-desc">AI-generated concise titles based on initial conversation content when saving new chats.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🔐</span>
+              Local Storage
+            </div>
+            <div class="feature-desc">All data stays on your device. No cloud sync, no external dependencies, complete data ownership.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configuration & Models -->
+      <div class="feature-category">
+        <h3>⚙️ Configuration & Models</h3>
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🌐</span>
+              Ollama Integration
+            </div>
+            <div class="feature-desc">Run models locally with full offline capability. Model selection dialog and automatic validation.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🔑</span>
+              Multi-Provider APIs
+            </div>
+            <div class="feature-desc">Configure OpenAI, Anthropic, Gemini, Groq, OpenRouter, and self-hosted endpoints with flexible model assignment.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🎯</span>
+              Model-Task Routing
+            </div>
+            <div class="feature-desc">Assign different models for different tasks. Use fast models for titling, powerful models for reasoning.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🔌</span>
+              OpenAI-Compatible Endpoints
+            </div>
+            <div class="feature-desc">Support for any endpoint that implements the OpenAI protocol. Flexible base URL configuration.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UI & Experience -->
+      <div class="feature-category">
+        <h3>🎨 UI & Experience</h3>
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">⌨️</span>
+              Command Palette
+            </div>
+            <div class="feature-desc">Access every command with Ctrl+K. Searchable menu for all features and functions.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🎯</span>
+              Context Menus
+            </div>
+            <div class="feature-desc">Right-click for item-specific actions. Generate takeaways, copy code, or access relevant features instantly.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🔔</span>
+              Notification Banners
+            </div>
+            <div class="feature-desc">Non-intrusive notifications for API rate limits, system messages, and important alerts.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🎨</span>
+              Customizable Canvas
+            </div>
+            <div class="feature-desc">Toggle grid visibility, snap-to-grid, smart guides. Adjust panning sensitivity and font settings on-canvas.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🌓</span>
+              Dark Theme
+            </div>
+            <div class="feature-desc">Premium dark interface optimized for visual reasoning and extended work sessions.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📱</span>
+              Responsive Design
+            </div>
+            <div class="feature-desc">Optimized for desktop-first usage with keyboard shortcuts and mouse-based navigation.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plugins & Extensibility -->
+      <div class="feature-category">
+        <h3>🔧 Plugins & Extensibility</h3>
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🎯</span>
+              Plugin Ecosystem
+            </div>
+            <div class="feature-desc">Extensible architecture ready for custom integrations and workflow-specific tools.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📚</span>
+              RAG (Retrieval-Augmented Generation)
+            </div>
+            <div class="feature-desc">Local document indexing and semantic search. Enhance AI responses with your own knowledge base.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">⚙️</span>
+              Code Execution
+            </div>
+            <div class="feature-desc">Execute code nodes directly. Test code snippets and visualize results within your reasoning canvas.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📊</span>
+              Data Visualization
+            </div>
+            <div class="feature-desc">Advanced charting and visualization tools integrated into the canvas workflow.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🔗</span>
+              Custom Tools
+            </div>
+            <div class="feature-desc">Build your own integrations for specialized workflows, data sources, and processing pipelines.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Licensing & Access -->
+      <div class="feature-category">
+        <h3>🔐 Licensing & Access</h3>
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🎁</span>
+              Free 5-Day Trial
+            </div>
+            <div class="feature-desc">Full feature access with no credit card required. Experience the complete platform before committing.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">✅</span>
+              Offline Activation
+            </div>
+            <div class="feature-desc">Activate once, work forever. No online checks or recurring validations required.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🛡️</span>
+              No Telemetry
+            </div>
+            <div class="feature-desc">Your privacy is protected. Zero tracking, no background data collection, no telemetry whatsoever.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">🌍</span>
+              Works Offline
+            </div>
+            <div class="feature-desc">Complete offline operation with local models. Run Graphite anywhere, anytime, without internet.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-title">
+              <span class="feature-icon">📧</span>
+              Direct Support
+            </div>
+            <div class="feature-desc">Pro subscribers get email support. Founders get direct developer access and strategic input.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CORE CAPABILITIES (original section) -->
+    <section class="container">
       <h2>Core Capabilities</h2>
       <div class="grid-3">
         <div class="card">
