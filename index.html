@@ -416,6 +416,92 @@
       line-height: 1.6;
     }
 
+    /* ====== FEATURE LIST GRID ====== */
+    .feature-list-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-top: 28px;
+      overflow: visible;
+    }
+
+    .feature-list-card {
+      position: relative;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(36, 36, 36, 0.3);
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+      cursor: default;
+      overflow: visible;
+      z-index: 1;
+    }
+
+    .feature-list-card:hover {
+      background: rgba(36, 36, 36, 0.5);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .feature-list-card h3 {
+      margin: 0 0 12px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--node-response);
+    }
+
+    .feature-list-card ul {
+      margin: 0;
+      padding-left: 20px;
+      list-style-type: disc;
+    }
+
+    .feature-list-card li {
+      margin-bottom: 8px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* ====== HOVER TOOLTIP ====== */
+    .feature-tooltip {
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 16px;
+      background: rgba(36, 36, 36, 0.98);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      white-space: normal;
+      width: 280px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 10000;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .feature-list-card:hover .feature-tooltip {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (max-width: 1024px) {
+      .feature-list-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .feature-list-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* ====== PRICING TABLE ====== */
     .pricing-table {
       width: 100%;
@@ -683,121 +769,136 @@
     <!-- FEATURES IN DEPTH -->
     <section id="features" class="container">
       <h2>Complete Feature List</h2>
-      <div class="grid-3">
-        <div class="card">
+      <div class="feature-list-grid">
+        <div class="feature-list-card">
           <h3>Canvas & Navigation</h3>
           <ul>
-            <li>Node-graph canvas for spatial reasoning organization</li>
-            <li>Pan with middle-mouse, zoom with Ctrl+scroll</li>
-            <li>Area zoom with Shift+drag, rubber-band selection</li>
-            <li>Frames for grouping and organizing nodes</li>
-            <li>Navigation pins to bookmark canvas locations</li>
-            <li>Sticky notes for floating annotations</li>
-            <li>Dynamic grid with snap-to-grid and smart guides</li>
+            <li>Node-graph canvas for spatial reasoning</li>
+            <li>Pan, zoom, area zoom controls</li>
+            <li>Multi-item selection and manipulation</li>
+            <li>Frames for grouping and organizing</li>
+            <li>Navigation pins and bookmarks</li>
+            <li>Sticky notes for annotations</li>
+            <li>Dynamic grid with snap and guides</li>
           </ul>
+          <div class="feature-tooltip">Organize your thinking spatially with an intuitive canvas that supports grouping, bookmarking, and visual alignment tools.</div>
         </div>
-        <div class="card">
+        <div class="feature-list-card">
           <h3>Content & Nodes</h3>
           <ul>
-            <li>Chat nodes with multi-modal support (text, images)</li>
-            <li>Markdown formatting and scrollable content</li>
+            <li>Chat nodes with multi-modal support</li>
+            <li>Markdown formatting and images</li>
             <li>Code nodes with syntax highlighting</li>
-            <li>Automatic language detection and copy-code button</li>
-            <li>Document nodes for file content display</li>
+            <li>Document nodes for file content</li>
             <li>Contextual branching from any point</li>
-            <li>Response regeneration for alternative paths</li>
+            <li>Response regeneration</li>
+            <li>Scrollable and collapsible content</li>
           </ul>
+          <div class="feature-tooltip">Create and manipulate different node types to represent conversations, code snippets, and document references with full formatting support.</div>
         </div>
-        <div class="card">
+        <div class="feature-list-card">
           <h3>Connections & Relationships</h3>
           <ul>
-            <li>Conversation flow visualization with arrows</li>
-            <li>Custom path routing with bezier control points</li>
-            <li>Content links between nodes and generated content</li>
-            <li>System prompt connections for custom AI behavior</li>
-            <li>Orthogonal routing for organized connections</li>
-            <li>Color-coded conversation branches</li>
+            <li>Conversation flow visualization</li>
+            <li>Custom path routing with pins</li>
+            <li>Bezier curve control points</li>
+            <li>Content links between nodes</li>
+            <li>System prompt connections</li>
+            <li>Orthogonal routing option</li>
+            <li>Color-coded branches</li>
           </ul>
+          <div class="feature-tooltip">Visualize relationships between nodes with customizable paths and connections that help clarify your reasoning flow.</div>
         </div>
-        <div class="card">
+        <div class="feature-list-card">
           <h3>AI & Analysis</h3>
           <ul>
-            <li>Multi-provider support (OpenAI, Anthropic, Gemini, Groq, Ollama)</li>
-            <li>Run workflows across different models simultaneously</li>
-            <li>AI-powered chart generation (bar, line, pie, histogram, Sankey)</li>
-            <li>Image generation from text prompts</li>
-            <li>Generate key takeaways and explainers</li>
-            <li>System prompt customization for role-based behavior</li>
+            <li>Multi-provider support (5+ services)</li>
+            <li>Run workflows across all models</li>
+            <li>AI chart generation (5 types)</li>
+            <li>Image generation from prompts</li>
+            <li>Generate takeaways and explainers</li>
+            <li>Custom system prompts per branch</li>
+            <li>Role-based AI behavior</li>
           </ul>
+          <div class="feature-tooltip">Leverage different AI models simultaneously to generate content, analyze data, create visualizations, and explore multiple reasoning paths.</div>
         </div>
-        <div class="card">
+        <div class="feature-list-card">
           <h3>File & Content</h3>
           <ul>
-            <li>File attachment via button or drag-and-drop</li>
-            <li>Image support (PNG, JPG, JPEG, WebP)</li>
-            <li>Document formats (TXT, MD, PY, JSON, HTML, CSS, JS, CSV, XML, PDF, DOCX)</li>
-            <li>Automatic text extraction from all formats</li>
-            <li>Full-text search across canvas nodes</li>
+            <li>Drag-and-drop file attachment</li>
+            <li>Image formats (PNG, JPG, WebP)</li>
+            <li>11+ document formats supported</li>
+            <li>Automatic text extraction</li>
+            <li>Full-text search across canvas</li>
             <li>Spell checking with suggestions</li>
+            <li>Multi-modal prompt support</li>
           </ul>
+          <div class="feature-tooltip">Attach and process various file types directly into your workspace with automatic parsing and searchable content indexing.</div>
         </div>
-        <div class="card">
-          <h3>Session & Knowledge Management</h3>
+        <div class="feature-list-card">
+          <h3>Session & Knowledge</h3>
           <ul>
-            <li>Chat library with load, delete, rename functions</li>
-            <li>Search saved sessions by title</li>
+            <li>Chat library for all sessions</li>
+            <li>Load, delete, rename, search</li>
             <li>Manual save with Ctrl+S</li>
-            <li>Complete state preservation (nodes, connections, zoom, scroll)</li>
-            <li>Local SQLite database storage</li>
-            <li>AI-generated automatic titles for new chats</li>
-            <li>All data stays on your device</li>
+            <li>Full state preservation</li>
+            <li>Local SQLite database</li>
+            <li>Auto-generated titles</li>
+            <li>Zero cloud dependency</li>
           </ul>
+          <div class="feature-tooltip">Save and manage all your work locally with automatic session titling and complete state recovery including zoom levels and scroll positions.</div>
         </div>
-        <div class="card">
+        <div class="feature-list-card">
           <h3>Configuration & Models</h3>
           <ul>
-            <li>Ollama integration for local model execution</li>
-            <li>API endpoint configuration for multiple providers</li>
-            <li>Model-specific task routing and assignment</li>
-            <li>OpenAI-compatible endpoint support</li>
-            <li>Flexible base URL configuration</li>
+            <li>Ollama local model execution</li>
+            <li>OpenAI, Anthropic, Gemini, Groq</li>
             <li>API key management</li>
+            <li>Model-task specific routing</li>
+            <li>OpenAI-compatible endpoints</li>
+            <li>Flexible base URL config</li>
+            <li>Provider switching</li>
           </ul>
+          <div class="feature-tooltip">Connect to any AI provider with flexible configuration and assign different models for different tasks based on your needs.</div>
         </div>
-        <div class="card">
-          <h3>UI & User Experience</h3>
+        <div class="feature-list-card">
+          <h3>UI & Experience</h3>
           <ul>
-            <li>Command palette with Ctrl+K for all commands</li>
-            <li>Context menus for item-specific actions</li>
-            <li>Non-intrusive notification banners</li>
-            <li>On-canvas customization controls</li>
-            <li>Customizable grid, snap settings, font sizes</li>
-            <li>Dark theme optimized for extended sessions</li>
-            <li>Keyboard shortcuts for all major functions</li>
+            <li>Command palette with Ctrl+K</li>
+            <li>Context menus for actions</li>
+            <li>Notification banners</li>
+            <li>Customizable canvas settings</li>
+            <li>Grid and font adjustments</li>
+            <li>Dark theme optimized</li>
+            <li>Complete keyboard shortcuts</li>
           </ul>
+          <div class="feature-tooltip">Access all features through intuitive menus, keyboard shortcuts, and customizable on-canvas controls for efficient workflows.</div>
         </div>
-        <div class="card">
+        <div class="feature-list-card">
           <h3>Plugins & Extensibility</h3>
           <ul>
-            <li>Plugin ecosystem architecture</li>
-            <li>RAG (Retrieval-Augmented Generation) with local documents</li>
-            <li>Code execution nodes for testing snippets</li>
-            <li>Advanced data visualization tools</li>
-            <li>Custom tool integration framework</li>
+            <li>Plugin architecture framework</li>
+            <li>RAG with local documents</li>
+            <li>Code execution nodes</li>
+            <li>Data visualization tools</li>
+            <li>Custom integrations</li>
             <li>Workflow-specific extensions</li>
+            <li>API for developers</li>
           </ul>
+          <div class="feature-tooltip">Extend Graphite's capabilities with plugins for RAG, code execution, advanced visualizations, and custom tools tailored to your workflow.</div>
         </div>
-        <div class="card">
+        <div class="feature-list-card">
           <h3>Licensing & Privacy</h3>
           <ul>
-            <li>Free 5-day trial with full features</li>
-            <li>Offline activation, one-time setup</li>
-            <li>Zero telemetry and tracking</li>
-            <li>Complete offline operation with local models</li>
-            <li>No background network calls</li>
-            <li>Direct developer support for Pro subscribers</li>
-            <li>Data ownership and independence</li>
+            <li>5-day free trial, no card needed</li>
+            <li>Offline activation</li>
+            <li>Zero telemetry or tracking</li>
+            <li>Fully offline operation mode</li>
+            <li>Complete data ownership</li>
+            <li>Direct developer support</li>
+            <li>Independence and reliability</li>
           </ul>
+          <div class="feature-tooltip">Activate once and work forever with complete privacy, no tracking, and the ability to work entirely offline on your own device.</div>
         </div>
       </div>
     </section>
