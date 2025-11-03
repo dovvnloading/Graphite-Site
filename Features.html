@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Graphite Pro — Complete Feature List</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Explore the complete feature list of Graphite Pro, the local-first AI workspace." />
+  <style>
+    :root {
+      --bg: #1a1a1a;
+      --surface: #242424;
+      --surface-light: #2d2d2d;
+      --grid: rgba(255,255,255,.04);
+      --line: rgba(255,255,255,.1);
+      --text: #f1f5f9;
+      --text-muted: #9ca3af;
+      --node-query: #10b981;
+      --node-response: #0ea5e9;
+      --node-analysis: #a855f7;
+      --accent-orange: #f59e0b;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, Helvetica, Arial;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(60px);
+    }
+
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0px) translateX(0px); }
+      50% { transform: translateY(-20px) translateX(10px); }
+    }
+
+    @keyframes float-slower {
+      0%, 100% { transform: translateY(0px) translateX(0px); }
+      50% { transform: translateY(20px) translateX(-10px); }
+    }
+
+    .orb-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.15), transparent 70%);
+      top: -100px;
+      right: -150px;
+      animation: float-slow 20s ease-in-out infinite;
+    }
+
+    .orb-2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.12), transparent 70%);
+      bottom: -50px;
+      left: -100px;
+      animation: float-slower 25s ease-in-out infinite;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* ====== NAV ====== */
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--line);
+      background: rgba(26, 26, 26, 0.9);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .btn {
+      display: inline-block;
+      padding: 10px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--node-query), var(--node-response));
+      color: #0b0e1a;
+      border-color: transparent;
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #059669, #0284c7);
+    }
+
+    /* ====== HEADER ====== */
+    header {
+      padding: 60px 24px 40px;
+      text-align: center;
+      position: relative;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.2rem);
+      line-height: 1.1;
+      margin: 0 0 20px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+
+    .lead {
+      max-width: 800px;
+      margin: 0 auto 20px;
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+
+    /* ====== FEATURES LIST ====== */
+    .feature-list-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+      margin-top: 28px;
+      overflow: visible;
+    }
+
+    .feature-list-card {
+      position: relative;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(36, 36, 36, 0.3);
+      backdrop-filter: blur(8px);
+      transition: all 0.3s ease;
+      cursor: default;
+      overflow: visible;
+      z-index: 1;
+    }
+
+    .feature-list-card:hover {
+      background: rgba(36, 36, 36, 0.5);
+      border-color: rgba(255, 255, 255, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .feature-list-card h3 {
+      margin: 0 0 12px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--node-response);
+    }
+
+    .feature-list-card ul {
+      margin: 0;
+      padding-left: 20px;
+      list-style-type: disc;
+    }
+
+    .feature-list-card li {
+      margin-bottom: 8px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .feature-tooltip {
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 16px;
+      background: rgba(36, 36, 36, 0.98);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      white-space: normal;
+      width: 280px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 10000;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .feature-list-card:hover .feature-tooltip {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    h2 {
+      font-size: 2rem;
+      margin: 0 0 12px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+    }
+
+    section {
+      margin: 60px 0;
+    }
+
+    /* ====== FOOTER ====== */
+    footer {
+      border-top: 1px solid var(--line);
+      margin-top: 100px;
+      padding: 48px 24px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      header { padding: 40px 24px 30px; }
+      section { margin: 40px 0; }
+      footer { flex-direction: column; }
+      h1 { font-size: 2rem; }
+      .feature-list-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+
+  <main>
+    <!-- NAV -->
+    <nav class="nav" aria-label="Primary">
+      <div class="container nav-row">
+        <a class="brand" href="index.html">
+          <img src="https://raw.githubusercontent.com/dovvnloading/Graphite-Site/main/graphite.png" alt="Graphite" style="width: 32px; height: 32px; border-radius: 6px;">
+          <span>Graphite</span>
+        </a>
+        <div class="nav-links">
+          <a href="index.html#features">Features</a>
+          <a href="index.html#pricing">Pricing</a>
+          <a class="btn btn-primary" href="index.html#download">Download</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- HEADER -->
+    <header>
+      <h1>Complete Feature List</h1>
+      <p class="lead">Explore every capability that makes Graphite Pro the ultimate visual reasoning workspace.</p>
+      <a class="btn btn-primary" href="index.html">← Back to Home</a>
+    </header>
+
+    <!-- FEATURES IN DEPTH -->
+    <section class="container">
+      <h2>All Features</h2>
+      <div class="feature-list-grid">
+        <div class="feature-list-card">
+          <h3>Canvas & Navigation</h3>
+          <ul>
+            <li>Node-graph canvas for spatial reasoning</li>
+            <li>Pan, zoom, and area zoom controls</li>
+            <li>Frames & Containers for organization</li>
+            <li>Conversation timeline minimap</li>
+            <li>Navigation pins and bookmarks</li>
+            <li>Sticky notes for annotations</li>
+            <li>Dynamic grid with snap, guides &amp; orthogonal routing</li>
+          </ul>
+          <div class="feature-tooltip">Organize your thinking spatially with an intuitive canvas that supports grouping with Frames and Containers, bookmarking, a conversation minimap, and visual alignment tools.</div>
+        </div>
+        <div class="feature-list-card">
+          <h3>Content & Nodes</h3>
+          <ul>
+            <li>Chat nodes with multi-modal support</li>
+            <li>Markdown formatting and images</li>
+            <li>Code nodes with syntax highlighting</li>
+            <li>Document nodes for file content</li>
+            <li>Contextual branching from any point</li>
+            <li>Response regeneration</li>
+            <li>Scrollable and collapsible content</li>
+          </ul>
+          <div class="feature-tooltip">Create and manipulate different node types to represent conversations, code snippets, and document references with full formatting support.</div>
+        </div>
+        <div class="feature-list-card">
+          <h3>Connections & Relationships</h3>
+          <ul>
+            <li>Conversation flow visualization</li>
+            <li>Custom path routing with pins</li>
+            <li>Bezier curve control points</li>
+            <li>Content links between nodes</li>
+            <li>System prompt connections</li>
+            <li>Orthogonal routing option</li>
+            <li>Color-coded branches</li>
+          </ul>
+          <div class="feature-tooltip">Visualize relationships between nodes with customizable paths and connections that help clarify your reasoning flow.</div>
+        </div>
+        <div class="feature-list-card">
+          <h3>AI & Analysis</h3>
+          <ul>
+            <li>Multi-provider support (5+ services)</li>
+            <li>Run workflows across all models</li>
+            <li>AI chart generation (5 types)</li>
+            <li>Image generation from prompts</li>
+            <li>Generate takeaways and explainers</li>
+            <li>Custom system prompts per branch</li>
+            <li>Role-based AI behavior</li>
+          </ul>
+          <div class="feature-tooltip">Leverage different AI models simultaneously to generate content, analyze data, create visualizations, and explore multiple reasoning paths.</div>
+        </div>
+        <div class="feature-list-card">
+          <h3>File & Content</h3>
+          <ul>
+            <li>Drag-and-drop file attachment</li>
+            <li>Image formats (PNG, JPG, WebP)</li>
+            <li>11+ document formats supported</li>
+            <li>Automatic text extraction</li>
+            <li>Export nodes to PDF, DOCX, MD, and more</li>
+            <li>Multi-modal prompt support</li>
+            <li>Full-text search across canvas</li>
+          </ul>
+          <div class="feature-tooltip">Attach and process files directly in your workspace. Export any content to standard formats, with automatic parsing and searchable content indexing.</div>
+        </div>
+        <div class="feature-list-card">
+          <h3>Session & Knowledge</h3>
+          <ul>
+            <li>Chat library for all sessions</li>
+            <li>Load, delete, rename, search</li>
+            <li>Manual save with Ctrl+S</li>
+            <li>Full state preservation</li>
+            <li>Local SQLite database</li>
+            <li>Auto-generated titles</li>
+            <li>Zero cloud dependency</li>
+          </ul>
+          <div class="feature-tooltip">Save and manage all your work locally with automatic session titling and complete state recovery including zoom levels and scroll positions.</div>
+        </div>
+        <div class="feature-list-card">
+          <h3>Configuration & Models</h3>
+          <ul>
+            <li>Ollama local model execution</li>
+            <li>OpenAI, Anthropic, Gemini, Groq</li>
+            <li>API key management</li>
+            <li>Model-task specific routing</li>
+            <li>OpenAI-compatible endpoints</li>
+            <li>Flexible base URL config</li>
+            <li>Provider switching</li>
+          </ul>
+          <div class="feature-tooltip">Connect to any AI provider with flexible configuration and assign different models for different tasks based on your needs.</div>
+        </div>
+        <div class="feature-list-card">
+          <h3>UI & Experience</h3>
+          <ul>
+            <li>Command palette with Ctrl+K</li>
+            <li>Search overlay with Ctrl+F</li>
+            <li>Context menus for actions</li>
+            <li>Customizable canvas settings</li>
+            <li>Grid and font adjustments</li>
+            <li>Dark theme optimized</li>
+            <li>Complete keyboard shortcuts</li>
+          </ul>
+          <div class="feature-tooltip">Access all features via the Command Palette, search overlay, context menus, and keyboard shortcuts. Customize your workspace with on-canvas controls.</div>
+        </div>
+        <div class="feature-list-card">
+          <h3>Plugins & Extensibility</h3>
+          <ul>
+            <li>Plugin architecture framework</li>
+            <li>System Prompt Plugin</li>
+            <li>Py-Coder Plugin with code execution</li>
+            <li>Data visualization tools</li>
+            <li>Custom integrations</li>
+            <li>Workflow-specific extensions</li>
+            <li>API for developers</li>
+          </ul>
+          <div class="feature-tooltip">Extend Graphite with powerful plugins like the Py-Coder for code execution and the System Prompt editor, plus tools for RAG, visualizations, and custom workflows.</div>
+        </div>
+        <div class="feature-list-card">
+          <h3>Licensing & Privacy</h3>
+          <ul>
+            <li>5-day free trial, no card needed</li>
+            <li>Offline activation</li>
+            <li>Zero telemetry or tracking</li>
+            <li>Fully offline operation mode</li>
+            <li>Complete data ownership</li>
+            <li>Direct developer support</li>
+            <li>Independence and reliability</li>
+          </ul>
+          <div class="feature-tooltip">Activate once and work forever with complete privacy, no tracking, and the ability to work entirely offline on your own device.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BACK TO HOME -->
+    <section class="container" style="text-align: center;">
+      <a class="btn btn-primary" href="index.html">← Back to Home</a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div>© 2025 Graphite. All rights reserved.</div>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <a class="btn" href="https://github.com/dovvnloading/Graphite" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn" href="https://github.com/dovvnloading/Graphite-Site/blob/main/Documentation.md" target="_blank" rel="noopener">Docs</a>
+        <a class="btn" href="mailto:dev.graphite@gmail.com">Contact</a>
+      </div>
+    </footer>
+  </main>
+</body>
+</html>
