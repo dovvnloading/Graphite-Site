@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Changelog — Graphite Pro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Development log and release notes for Graphite Pro, a local-first AI workspace." />
+  <style>
+    :root {
+      --bg: #1a1a1a;
+      --surface: #242424;
+      --surface-light: #2d2d2d;
+      --grid: rgba(255,255,255,.04);
+      --line: rgba(255,255,255,.1);
+      --text: #f1f5f9;
+      --text-muted: #9ca3af;
+      --node-query: #10b981;
+      --node-response: #0ea5e9;
+      --node-analysis: #a855f7;
+      --accent-orange: #f59e0b;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, Helvetica, Arial;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    @keyframes float-slow {
+      0%, 100% { transform: translateY(0px) translateX(0px); }
+      50% { transform: translateY(-20px) translateX(10px); }
+    }
+
+    @keyframes float-slower {
+      0%, 100% { transform: translateY(0px) translateX(0px); }
+      50% { transform: translateY(20px) translateX(-10px); }
+    }
+
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        linear-gradient(var(--grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(60px);
+    }
+
+    .orb-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.15), transparent 70%);
+      top: -100px;
+      right: -150px;
+      animation: float-slow 20s ease-in-out infinite;
+    }
+
+    .orb-2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.12), transparent 70%);
+      bottom: -50px;
+      left: -100px;
+      animation: float-slower 25s ease-in-out infinite;
+    }
+
+    .orb-3 {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.1), transparent 70%);
+      top: 50%;
+      right: 10%;
+      animation: float-slow 30s ease-in-out infinite reverse;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--line);
+      background: rgba(26, 26, 26, 0.9);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--text); font-weight: 600; }
+
+
+    .btn {
+      display: inline-block;
+      padding: 10px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.05);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 0.95rem;
+    }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--node-query), var(--node-response));
+      color: #0b0e1a;
+      border-color: transparent;
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #059669, #0284c7);
+    }
+
+    header {
+      padding: 100px 24px 80px;
+      text-align: center;
+      position: relative;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      line-height: 1.1;
+      margin: 0 0 20px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+
+    .lead {
+      max-width: 800px;
+      margin: 0 auto 32px;
+      color: var(--text-muted);
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      line-height: 1.8;
+    }
+    
+    section {
+      padding: 0 24px;
+    }
+    
+    .timeline {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .changelog-entry {
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(36, 36, 36, 0.3);
+      backdrop-filter: blur(8px);
+      margin-bottom: 32px;
+    }
+    .changelog-entry h3 {
+      color: var(--text);
+      font-size: 1.5rem;
+      margin: 0 0 4px;
+      font-weight: 800;
+    }
+    .changelog-entry .date {
+      color: var(--text-muted);
+      font-family: ui-monospace, monospace;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+    }
+    .changelog-entry h4 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 20px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+    }
+    .changelog-entry h4.added { color: var(--node-query); }
+    .changelog-entry h4.fixed { color: var(--accent-orange); }
+    .changelog-entry h4.changed { color: var(--node-response); }
+    .changelog-entry h4.refactor { color: var(--node-analysis); }
+    
+    .changelog-entry ul, .changelog-entry ol {
+      margin: 12px 0 0;
+      padding-left: 24px;
+    }
+    
+    .changelog-entry li {
+      margin-bottom: 12px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+    
+    .changelog-entry li ul, .changelog-entry li ol {
+        margin-top: 8px;
+    }
+
+    .changelog-entry strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+    
+    .changelog-entry code {
+      background: var(--surface-light);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: ui-monospace, monospace;
+      font-size: 0.9em;
+      color: var(--text);
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      margin-top: 100px;
+      padding: 48px 24px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      header { padding: 60px 24px 40px; }
+      section { padding: 0 12px; }
+      footer { flex-direction: column; }
+      h1 { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="bg-orb orb-1"></div>
+  <div class="bg-orb orb-2"></div>
+  <div class="bg-orb orb-3"></div>
+
+  <main>
+    <nav class="nav" aria-label="Primary">
+      <div class="container nav-row">
+        <a class="brand" href="Site_Ref.html">
+          <img src="https://raw.githubusercontent.com/dovvnloading/Graphite-Site/main/graphite.png" alt="Graphite" style="width: 32px; height: 32px; border-radius: 6px;">
+          <span>Graphite</span>
+        </a>
+        <div class="nav-links">
+          <a href="Site_Ref.html#features">Features</a>
+          <a href="Site_Ref.html#pricing">Pricing</a>
+          <a href="Changelog.html" class="active">Dev Log</a>
+          <a class="btn btn-primary" href="Site_Ref.html#download">Download</a>
+        </div>
+      </div>
+    </nav>
+
+    <header id="top">
+      <h1>Development Log</h1>
+      <p class="lead">
+        A detailed, reverse-chronological record of all changes, fixes, and architectural decisions made during the development of Graphite Pro.
+      </p>
+    </header>
+
+    <section id="changelog">
+      <div class="timeline">
+      
+        <div class="changelog-entry">
+          <h3><code>[Beta v.0.6.6]</code></h3>
+          <p class="date">2025-11-03</p>
+          <p>This release introduces comprehensive keyboard navigation for the canvas, improving accessibility and workflow speed. It also includes several quality-of-life improvements and a critical bug fix for the cursor state.</p>
+          <h4 class="added">Added</h4>
+          <ul>
+            <li><strong>Implemented Full Keyboard Navigation.</strong>
+              <ul>
+                <li><strong>WASD Panning:</strong> The canvas can now be panned smoothly using the W, A, S, and D keys. Movement is continuous while keys are held down.</li>
+                <li><strong>Q/E Zoom:</strong> Users can now zoom in with the 'E' key and zoom out with the 'Q' key, providing a keyboard-centric alternative to mouse-wheel zooming.</li>
+                <li><strong>Logical Node Traversal (<code>Ctrl + Arrow Keys</code>):</strong> A new system allows for precise navigation between related nodes:
+                  <ul>
+                    <li><code>Ctrl+Up</code>: Jumps to the parent of the currently selected node.</li>
+                    <li><code>Ctrl+Down</code>: Jumps to the first child of the currently selected node.</li>
+                    <li><code>Ctrl+Left</code>/<code>Ctrl+Right</code>: Jumps to the previous or next sibling node in the same branch.</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><strong>Added Welcome Screen Preference.</strong>
+              <ul>
+                <li><strong>Feature:</strong> An option to "Show Welcome Screen on Startup" has been added to the <code>Settings > Appearance</code> dialog.</li>
+                <li><strong>Effect:</strong> When unchecked, the application will bypass the welcome screen and launch directly into the main interface, loading the most recent chat session. This preference is saved and persists across launches.</li>
+              </ul>
+            </li>
+          </ul>
+          <h4 class="fixed">Fixed</h4>
+          <ul>
+            <li><strong>Resolved Stuck Panning Cursor Bug.</strong>
+              <ul>
+                <li><strong>Problem:</strong> The cursor would get stuck in the "closed hand" panning state if the user released the middle mouse button while the cursor was outside the application window.</li>
+                <li><strong>Solution:</strong> The view's <code>mouseMoveEvent</code> was enhanced to reliably check the global state of the mouse buttons. It now correctly detects when the middle mouse button is no longer pressed and resets the cursor to its default state, regardless of where the release event occurred.</li>
+              </ul>
+            </li>
+            <li><strong>Corrected Welcome Screen Behavior.</strong>
+              <ul>
+                <li><strong>Problem:</strong> The welcome screen would remain open in the background after a user selected a project or started a new chat.</li>
+                <li><strong>Solution:</strong> The welcome screen now automatically closes itself upon performing an action that opens the main chat window, streamlining the application startup flow.</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="changelog-entry">
+          <h3><code>[Beta v.0.6.5]</code></h3>
+          <p class="date">2025-11-03</p>
+          <p>This release refines the AI's code generation output and resolves critical architectural bugs related to plugin functionality, resulting in a more stable and predictable user experience.</p>
+          <h4 class="refactor">Architectural Refactor</h4>
+          <ul>
+            <li><strong>Standardized AI Code Block Generation.</strong>
+              <ul>
+                <li><strong>Problem:</strong> The AI model would often split a single logical code block across multiple markdown fences, causing the application to create a separate <code>CodeNode</code> for each fragment. This resulted in a cluttered and disorganized canvas.</li>
+                <li><strong>Solution:</strong>
+                  <ol>
+                    <li>The <code>ChatAgent</code>'s system prompt has been updated with a strict new rule: all code, regardless of the number of segments, <strong>must</strong> be wrapped within a single <code>&lt;code_block&gt;...&lt;/code_block&gt;</code> XML tag.</li>
+                    <li>The response parsing logic in <code>ChatWindow</code> was re-architected to prioritize this new tag. It now first searches for <code>&lt;code_block&gt;</code>; if found, it extracts the entire content and treats it as a single unit for one <code>CodeNode</code>.</li>
+                    <li>A fallback mechanism was retained: if the tag is not found, the parser reverts to the old behavior of identifying individual markdown fences.</li>
+                  </ol>
+                </li>
+                <li><strong>Result:</strong> This ensures that all code generated in a single AI response is consolidated into one <code>CodeNode</code>, providing a clean, coherent output. The fallback maintains robustness if the model fails to adhere to the new format.</li>
+              </ul>
+            </li>
+          </ul>
+          <h4 class="fixed">Fixed</h4>
+          <ul>
+            <li><strong>Corrected <code>PyCoderNode</code> Contextual Attachment Logic.</strong>
+              <ul>
+                <li><strong>Problem:</strong> The PyCoder plugin could be incorrectly attached to a <code>CodeNode</code>. When executed, this would cause a fatal <code>AttributeError</code> because <code>CodeNode</code> objects do not possess a <code>conversation_history</code>, which is essential for providing context to the AI.</li>
+                <li><strong>Solution:</strong>
+                  <ol>
+                    <li>The plugin creation logic in <code>graphite_plugin_portal.py</code> was updated. It now intelligently determines the correct parent for the <code>PyCoderNode</code>. If the user has a <code>CodeNode</code> selected, the system automatically traverses up to its parent <code>ChatNode</code> and attaches the PyCoder plugin there instead.</li>
+                    <li>Defensive code was added to <code>graphite_window.py</code>. The execution logic now verifies the parent node's type before attempting to access <code>conversation_history</code>, ensuring it always retrieves context from a valid source (<code>ChatNode</code> or another <code>PyCoderNode</code>).</li>
+                  </ol>
+                </li>
+                <li><strong>Result:</strong> The application no longer crashes when using the PyCoder plugin in this scenario. The plugin's attachment behavior is now architecturally sound and predictable.</li>
+              </ul>
+            </li>
+            <li><strong>Resolved <code>ImportError</code> on Startup.</strong>
+              <ul>
+                <li><strong>Problem:</strong> The application would fail to launch due to a circular or incorrect import statement where <code>graphite_plugin_portal.py</code> attempted to import <code>PyCoderNode</code> from <code>graphite_node.py</code> instead of the correct <code>graphite_pycoder.py</code> module.</li>
+                <li><strong>Solution:</strong> The invalid import path was corrected, resolving the dependency conflict and allowing the application to start normally.</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        
+        <div class="changelog-entry">
+          <h3><code>[Beta v.0.6.4]</code></h3>
+          <p class="date">2025-11-02</p>
+          <p>This release introduces a powerful and flexible content export system, allowing users to save the contents of individual nodes to a variety of standard file formats. The architecture for this feature is designed to be modular and easily extensible.</p>
+          <h4 class="refactor">Architectural Refactor</h4>
+          <ul>
+            <li><strong>Created a Centralized <code>Exporter</code> Module.</strong>
+              <ul>
+                <li><strong>Problem:</strong> Implementing export logic directly within UI classes would lead to scattered, duplicated code that is difficult to maintain.</li>
+                <li><strong>Solution:</strong> A new <code>graphite_exporter.py</code> file was created to house a dedicated <code>Exporter</code> class. This class encapsulates all file conversion and writing logic for each supported format. UI components now simply call the <code>Exporter</code> with the content and desired format, decoupling the user interface from the file generation process.</li>
+                <li><strong>Result:</strong> This modular design makes it simple to add new export formats in the future without modifying any UI code.</li>
+              </ul>
+            </li>
+          </ul>
+          <h4 class="added">Added</h4>
+          <ul>
+            <li><strong>Implemented Multi-Format Node Content Export.</strong>
+              <ul>
+                <li><strong>Feature:</strong> A new "Export to Doc" submenu is now available in the right-click context menu for <code>ChatNode</code>, <code>CodeNode</code>, and <code>DocumentNode</code>.</li>
+                <li><strong>Formats:</strong>
+                  <ul>
+                    <li><strong>Text File (.txt):</strong> Exports the raw text content.</li>
+                    <li><strong>Markdown File (.md):</strong> Exports the raw content, preserving markdown syntax. For code nodes, it automatically wraps the code in a markdown code block.</li>
+                    <li><strong>HTML Document (.html):</strong> Converts the node's markdown content into a self-contained, styled HTML file.</li>
+                    <li><strong>Word Document (.docx):</strong> Exports the content into a standard <code>.docx</code> file. (Requires <code>python-docx</code>)</li>
+                    <li><strong>PDF Document (.pdf):</strong> Renders the content into a PDF file, with special monospace formatting for code. (Requires <code>reportlab</code>)</li>
+                    <li><strong>Python Script (.py):</strong> An additional option exclusive to <code>CodeNode</code> for direct script saving.</li>
+                  </ul>
+                </li>
+                <li><strong>Image Export:</strong> The "Save Image As..." option for <code>ImageNode</code> was renamed to "Export Image" for consistency.</li>
+              </ul>
+            </li>
+            <li><strong>Graceful Handling of Optional Dependencies.</strong>
+              <ul>
+                <li><strong>Feature:</strong> The application now intelligently handles cases where optional libraries required for certain export formats (<code>reportlab</code> for PDF, <code>python-docx</code> for DOCX) are not installed.</li>
+                <li><strong>User Experience:</strong> If a user attempts to export to a format with a missing dependency, the application will not crash. Instead, a clear and informative message box appears, explaining which library is needed and providing the <code>pip install</code> command to install it.</li>
+              </ul>
+            </li>
+          </ul>
+          <h4 class="fixed">Fixed</h4>
+          <ul>
+            <li><strong>Resolved Crash on Export Dialogs.</strong>
+              <ul>
+                <li><strong>Problem:</strong> The application would crash with an <code>AttributeError</code> when showing the success/failure message box after an export, because the dialog's parent was being set incorrectly.</li>
+                <li><strong>Solution:</strong> The logic for retrieving the main window was corrected. Instead of an unreliable <code>self.parent()</code> call, the code now correctly traverses the object hierarchy from the <code>QGraphicsItem</code> (the node) to its scene, and then to the scene's <code>window</code> property, ensuring a valid <code>QWidget</code> parent is always found for the dialogs. This also fixed a bug where the dialogs were missing the application icon.</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.6.3]</code></h3>
+            <p class="date">2025-11-02</p>
+            <p>This update focuses on significant UI refinement and consistency, enhancing the visual language and interactive feedback of the core node-graph system.</p>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Persistent Node Connection Points.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> All <code>ChatNode</code> and <code>PyCoderNode</code> items now feature permanently visible connection points.</li>
+                        <li><strong>Detail:</strong> These points are rendered as colored half-circles that seamlessly emerge from the left (input) and right (output) sides of the node. The color of the connection point matches the node's identity color (e.g., green for user nodes, blue for AI nodes, purple for PyCoder), reinforcing the visual flow of information.</li>
+                        <li><strong>Result:</strong> This provides a clear, consistent, and aesthetically pleasing visual language for how nodes are connected, removing ambiguity about where connection lines terminate.</li>
+                    </ul>
+                </li>
+                <li><strong>Universal Connection Hover Animation.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> The animated "flowing arrow" effect, previously exclusive to primary chat connections, has been implemented across all directional connection types.</li>
+                        <li><strong>Effect:</strong> Hovering over any connection line (including those for code blocks, documents, images, and the PyCoder plugin) now triggers the animation, providing consistent visual feedback for interactivity and data flow across the entire canvas. The animation color is styled to match the specific connection type.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Resolved Visual Gap in Connection Lines.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> In a previous implementation, connection lines appeared to stop short of their target nodes because the connection dots they were anchored to were only visible on hover.</li>
+                        <li><strong>Solution:</strong> By making the new half-circle connection points permanently visible, the connection lines now appear to terminate perfectly at the node's edge, creating a visually complete and polished look.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.6.2]</code></h3>
+            <p class="date">2025-11-01</p>
+            <p>This is a rapid-response update focused on critical stability fixes, a quality-of-life improvement for the new Container system, and the introduction of a comprehensive, application-wide themeing architecture. A series of architectural flaws related to object lifecycles, coordinate systems, and import dependencies were identified and resolved, eliminating crashes and addressing visual bugs across the UI.</p>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Centralized Theme and Color Palette System.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> Hardcoded colors were scattered across numerous UI components, including both Qt stylesheets and custom <code>paint</code> methods within <code>QGraphicsItem</code>s. This made the application rigid and difficult to style.</li>
+                        <li><strong>Solution:</strong> A new, scalable themeing architecture was implemented.
+                            <ol>
+                                <li>A <code>ColorPalette</code> class was created in <code>graphite_styles.py</code> to act as a single source of truth for all custom-drawn UI elements (nodes, connections, highlights, etc.).</li>
+                                <li>A central <code>THEMES</code> dictionary now maps theme names ("dark", "mono") to both a full application stylesheet and a corresponding <code>ColorPalette</code> object.</li>
+                                <li>A global <code>apply_theme</code> function was established in <code>graphite_config.py</code>. This function updates the application's stylesheet and signals all open windows to repaint themselves using the new palette, ensuring a consistent, application-wide theme change.</li>
+                            </ol>
+                        </li>
+                        <li><strong>Result:</strong> This decouples visual presentation from component logic, resolves numerous visual bugs at their source, and enables the rapid development of future themes.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Introduced Dual-Mode "PyCoder" Plugin.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> The PyCoder plugin has been re-architected to support two distinct operational modes, providing both intelligent automation and direct user control.</li>
+                        <li><strong>AI-Driven Mode (Default):</strong> The AI now functions as a "tool-using" agent. It receives a high-level user prompt and independently determines whether to write and execute Python code to find the answer. The entire workflow—code generation, execution, output capture, and final analysis—is fully automated. This allows users to ask complex computational questions in natural language.</li>
+                        <li><strong>Manual Mode:</strong> The original functionality is preserved as a "Manual" mode. Users can switch to this mode to write, run, and debug their own Python code in a dedicated scratchpad, optionally receiving AI analysis on their code and its output.</li>
+                        <li><strong>Result:</strong> This transforms PyCoder from a simple code executor into a versatile and intelligent problem-solving tool, greatly expanding the application's capabilities.</li>
+                    </ul>
+                </li>
+                <li><strong>Upgraded PyCoder to be Context-Aware.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> The AI-Driven mode of the <code>Py-Coder</code> plugin now receives the full conversation history from its parent node.</li>
+                        <li><strong>Effect:</strong> The agent can now use the preceding conversation as context when generating code. This allows for more intuitive and powerful requests, such as referring to data or concepts mentioned in previous messages (e.g., "Take that list of names from before and sort it alphabetically").</li>
+                        <li><strong>Implementation:</strong> The <code>PyCoderExecutionWorker</code> was updated to accept the parent's <code>conversation_history</code>, and the <code>PyCoderExecutionAgent</code>'s system prompt was enhanced to instruct it on how to leverage this contextual information.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Resolved Critical Infinite Loop When Replying to PyCoder Nodes.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> Responding to a <code>PyCoderNode</code> would cause the application to hang with an infinite loading animation.</li>
+                        <li><strong>Solution (Architectural):</strong> The issue was traced to a critical flaw in the chat deserialization logic (<code>graphite_core.py</code>). A node was being incorrectly set as its own parent (<code>child_node.parent_node = child_node</code>), creating a self-referential loop in the graph's data structure. When the <code>ChatWorker</code> attempted to traverse this branch to build the conversation history, it entered an unbreakable <code>while</code> loop, causing the thread to hang indefinitely. The fix involved correcting the parent assignment to <code>child_node.parent_node = node</code>, restoring the integrity of the graph structure and eliminating the infinite loop.</li>
+                    </ul>
+                </li>
+                 <li><strong>Resolved Critical Circular Import Error on Launch.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> A circular dependency was introduced between high-level UI modules (<code>graphite_app.py</code>, <code>graphite_window.py</code>) and lower-level modules (<code>graphite_dialogs.py</code>), preventing the application from launching.</li>
+                        <li><strong>Solution:</strong> Theme utility functions (<code>apply_theme</code>, <code>get_current_palette</code>) were correctly moved from the high-level <code>graphite_app.py</code> module to the low-level <code>graphite_config.py</code> module, breaking the import cycle and restoring proper architectural layering.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.6.1]</code></h3>
+            <p class="date">2025-11-01 (Container System & Connection Logic Overhaul)</p>
+            <p>This update introduces the <code>Container</code>, a powerful new organizational tool, alongside a critical overhaul of the scene's connection rendering logic. The new <code>Container</code> system allows for complex nesting of any canvas item, while the connection fixes ensure that all visual links behave predictably and consistently, especially when interacting with grouped or collapsed items. This lays a more robust architectural foundation for future layout and interaction features.</p>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Introduced the "Container" Grouping System.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> A new, versatile grouping item that can contain any combination of other items on the canvas, including Chat Nodes, Notes, Charts, Frames, and even other Containers for deep nesting.</li>
+                        <li><strong>Interaction:</strong>
+                            <ul>
+                                <li><strong>Creation:</strong> Select any items and press <code>Ctrl+Shift+G</code> or use the Command Palette.</li>
+                                <li><strong>Collapsible State:</strong> Containers can be collapsed into a compact, node-like object to hide their contents and simplify the graph view. A pulsing glow indicates that a container is collapsed and holds hidden items.</li>
+                                <li><strong>Management:</strong> A dedicated header provides access to a collapse/expand button, a color picker for customization, and an editable title.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Resolved Critical Bug in Container Movement.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> When a <code>Container</code> was moved, the connection lines for the items inside it did not update their positions, appearing visually "stuck" on the canvas.</li>
+                        <li><strong>Solution:</strong> The <code>itemChange</code> method in the <code>Container</code> class was updated to correctly propagate position changes through the scene by calling <code>scene.nodeMoved()</code>. Its logic was aligned with the existing <code>Frame</code> class to ensure consistent, predictable behavior across all grouping items.</li>
+                    </ul>
+                </li>
+                <li><strong>Overhauled Connection Logic for Collapsed Containers.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> Connections to or from items within a collapsed <code>Container</code> would remain attached to the last known position of the invisible items, resulting in visually broken lines stretching across the canvas. Connections between two items inside the same collapsed container remained visible but disconnected.</li>
+                        <li><strong>Solution:</strong> The <code>update_path</code> method for all connection types (<code>ConnectionItem</code>, <code>ContentConnectionItem</code>, etc.) was overhauled. Connections now intelligently detect if their start or end node is within a collapsed <code>Container</code>.
+                            <ul>
+                                <li>If an endpoint is hidden, the connection line now dynamically retargets its visual endpoint to the boundary of the <code>Container</code> itself.</li>
+                                <li>If both endpoints of a connection are within the same collapsed container, the connection is now correctly hidden to reduce visual clutter.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.2.0]</code></h3>
+            <p class="date">2024-05-23</p>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li>This update introduces a major architectural refactoring to improve the project's structure, maintainability, and scalability. The application has been transitioned from a single, monolithic script into a modular, multi-file structure with a clear separation of concerns. The primary goal of this refactor was to decouple the User Interface, Core Logic, and AI Agent services from one another.</li>
+                <li>The new project structure is as follows:
+                    <ul>
+                        <li><code>graphite_app.py</code>: Serves as the main application entry point. It contains the primary <code>ChatWindow</code> class and is responsible for initializing and launching the application.</li>
+                        <li><code>graphite_ui.py</code>: Consolidates all classes related to the User Interface layer. This includes all Qt widgets, dialogs, custom graphics items for the scene (<code>ChatNode</code>, <code>ConnectionItem</code>, <code>Frame</code>, etc.), and view components (<code>ChatView</code>, <code>ChatScene</code>).</li>
+                        <li><code>graphite_core.py</code>: Manages the application's core logic and data persistence. It contains the <code>ChatDatabase</code> class for all SQLite operations and the <code>ChatSessionManager</code> for handling the serialization and deserialization of chat sessions.</li>
+                        <li><code>graphite_agents.py</code>: Isolates all logic related to AI model interaction. This module contains the base <code>ChatAgent</code> as well as specialized tool agents (<code>KeyTakeawayAgent</code>, <code>ExplainerAgent</code>, <code>ChartDataAgent</code>) and their corresponding <code>QThread</code> workers for asynchronous processing.</li>
+                        <li><code>graphite_config.py</code>: A centralized location for application-wide configuration constants, such as task identifiers and default model names.</li>
+                        <li><code>api_provider.py</code>: A dedicated module to abstract away the differences between various AI providers (Ollama, OpenAI-compatible, Google Gemini), presenting a unified interface to the rest of the application.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+      </div>
+    </section>
+
+    <footer>
+      <div>© 2025 Graphite. All rights reserved.</div>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <a class="btn" href="https://github.com/dovvnloading/Graphite" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn" href="https://github.com/dovvnloading/Graphite-Site/blob/main/Documentation.md" target="_blank" rel="noopener">Docs</a>
+        <a class="btn" href="mailto:dev.graphite@gmail.com">Contact</a>
+      </div>
+    </footer>
+  </main>
+</body>
+</html>
