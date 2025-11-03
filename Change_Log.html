@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+
 <html lang="en">
 <head>
   <meta charset="utf-8" />
@@ -353,7 +354,7 @@
             </li>
           </ul>
         </div>
-        
+
         <div class="changelog-entry">
           <h3><code>[Beta v.0.6.5]</code></h3>
           <p class="date">2025-11-03</p>
@@ -515,6 +516,39 @@
                         <li><strong>Implementation:</strong> The <code>PyCoderExecutionWorker</code> was updated to accept the parent's <code>conversation_history</code>, and the <code>PyCoderExecutionAgent</code>'s system prompt was enhanced to instruct it on how to leverage this contextual information.</li>
                     </ul>
                 </li>
+                <li><strong>Implemented Automated Error Correction for PyCoder.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> The AI-Driven <code>Py-Coder</code> agent is now capable of self-correction. If the code it generates results in an error, it will automatically attempt to debug and fix it.</li>
+                        <li><strong>Workflow:</strong>
+                            <ol>
+                                <li>The agent generates and executes code.</li>
+                                <li>If an error is detected in the output, the error log is fed back to a specialized <code>PyCoderRepairAgent</code>.</li>
+                                <li>The repair agent returns a corrected version of the code, which is then re-executed.</li>
+                                <li>This process repeats up to a maximum of four attempts. On the final attempt, the agent is prompted to try a completely different approach.</li>
+                            </ol>
+                        </li>
+                        <li><strong>Result:</strong> This significantly increases the reliability and success rate of the PyCoder feature, allowing it to overcome common coding mistakes without user intervention.</li>
+                    </ul>
+                </li>
+                <li><strong>Added a Real-Time Status Tracker to the PyCoder Node.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> The verbose "Execution Log" text area has been replaced with a clean, intuitive checklist UI (<code>StatusTrackerWidget</code>).</li>
+                        <li><strong>Effect:</strong> This new component provides at-a-glance feedback on the agent's progress, showing the status (Pending, Running, Success, Failure) of each stage in the workflow: Analyzing Prompt, Generating Code, Executing & Repairing, and Final Analysis. The "Running" state features a smooth, custom-drawn vector animation.</li>
+                        <li><strong>Implementation:</strong> This was achieved by creating a new <code>StatusIconWidget</code> that uses <code>QPainter</code> for crisp vector rendering, eliminating the pixelation issues of the previous icon-based approach. The worker thread now communicates with the UI using a structured system of <code>Enums</code> for stages and statuses, making the architecture more robust.</li>
+                    </ul>
+                </li>
+                <li><strong>Implemented Monochromatic Theme.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> A new "Monochromatic Mode" option is now available in <code>Settings > Appearance</code>. The user's choice is persisted across application sessions.</li>
+                        <li><strong>Effect:</strong> When enabled, it applies a grayscale color palette across the entire application, affecting everything from window backgrounds and buttons to custom-drawn node outlines and connection lines. This provides a lower-contrast, less colorful user experience.</li>
+                    </ul>
+                </li>
+                <li><strong>Implemented "Ghost Frame" Preview for Collapsed Containers.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> Hovering the cursor over a collapsed <code>Container</code> for 2 seconds now displays a semi-transparent "ghost" preview. This preview is centered on the cursor and shows the full size and shape the container will occupy when expanded.</li>
+                        <li><strong>Purpose:</strong> This provides essential spatial context, allowing users to plan their canvas layout and organize items around a collapsed group without needing to expand it first. The feature uses a <code>QTimer</code> to manage the hover delay and another <code>QTimer</code> to automatically dismiss the preview after 3 seconds.</li>
+                    </ul>
+                </li>
             </ul>
             <h4 class="fixed">Fixed</h4>
             <ul>
@@ -524,18 +558,73 @@
                         <li><strong>Solution (Architectural):</strong> The issue was traced to a critical flaw in the chat deserialization logic (<code>graphite_core.py</code>). A node was being incorrectly set as its own parent (<code>child_node.parent_node = child_node</code>), creating a self-referential loop in the graph's data structure. When the <code>ChatWorker</code> attempted to traverse this branch to build the conversation history, it entered an unbreakable <code>while</code> loop, causing the thread to hang indefinitely. The fix involved correcting the parent assignment to <code>child_node.parent_node = node</code>, restoring the integrity of the graph structure and eliminating the infinite loop.</li>
                     </ul>
                 </li>
-                 <li><strong>Resolved Critical Circular Import Error on Launch.</strong>
+                <li><strong>Integrated PyCoder Node into the Conversational Flow.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The <code>PyCoderNode</code> was architecturally treated as a terminal "tool" node, not a conversational participant. This prevented users from branching new replies from it, causing new messages to start a disconnected conversation instead.</li>
+                        <li><strong>Solution:</strong> The <code>PyCoderNode</code> was structurally upgraded to act as a proper conversational node.
+                            <ol>
+                                <li>It was given <code>children</code>, <code>conversation_history</code>, and <code>is_user</code> attributes, making it compatible with the scene's branching logic.</li>
+                                <li>The scene's node creation and connection logic was updated to recognize <code>PyCoderNode</code> as a valid parent.</li>
+                                <li>The application's state management now correctly sets the <code>PyCoderNode</code> as the active context after execution, ensuring subsequent user messages correctly attach to it.</li>
+                                <li>A secondary bug was fixed where <code>ConnectionItem</code>s would crash when trying to connect to a <code>PyCoderNode</code> due to missing <code>width</code> and <code>height</code> attributes; these were added to standardize the node's interface.</li>
+                            </ol>
+                        </li>
+                        <li><strong>Result:</strong> This change ensures that the PyCoder tool is no longer a "dead end" in the conversation, allowing for a seamless and logical flow between text-based chat and code execution.</li>
+                    </ul>
+                </li>
+                <li><strong>Resolved Critical <code>AttributeError</code> on Chat Loading and Rendering.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> A crash occurred when loading a chat or rendering the <code>PyCoderNode</code>'s status tracker, caused by an <code>AttributeError: unsupported keyword 'cap'</code>.</li>
+                        <li><strong>Solution:</strong> The <code>QPen</code> constructor in the <code>StatusIconWidget</code>'s <code>paintEvent</code> was being called with unsupported keyword arguments. The code was refactored to first instantiate the <code>QPen</code> object and then use its setter methods (<code>setCapStyle</code>, <code>setJoinStyle</code>) to configure it correctly, aligning with the PySide6 API and resolving the rendering crash. A similar error related to <code>previousSibling()</code> was also fixed by using direct widget references.</li>
+                    </ul>
+                </li>
+                <li><strong>Resolved Critical Circular Import Error on Launch.</strong>
                     <ul>
                         <li><strong>Problem:</strong> A circular dependency was introduced between high-level UI modules (<code>graphite_app.py</code>, <code>graphite_window.py</code>) and lower-level modules (<code>graphite_dialogs.py</code>), preventing the application from launching.</li>
                         <li><strong>Solution:</strong> Theme utility functions (<code>apply_theme</code>, <code>get_current_palette</code>) were correctly moved from the high-level <code>graphite_app.py</code> module to the low-level <code>graphite_config.py</code> module, breaking the import cycle and restoring proper architectural layering.</li>
                     </ul>
                 </li>
+                <li><strong>Ensured PyCoder Node Conforms to All Graph Rules.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The <code>PyCoderNode</code> and its connection did not respect scene-wide layout rules like "Snap to Grid," "Smart Guides," and "Orthogonal Connections."</li>
+                        <li><strong>Solution:</strong> The node's event handling was properly integrated with the scene's drag-and-drop lifecycle. It now correctly signals the start and end of a drag, allowing the scene to apply snapping and alignment logic. The <code>PyCoderConnectionItem</code> was also updated to check for and render in an orthogonal style when the mode is active.</li>
+                    </ul>
+                </li>
+                <li><strong>Ensured UI Consistency Across All Components in Monochromatic Mode.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> Several UI elements retained their original colors when the monochromatic theme was enabled, creating a visually inconsistent experience. This included the send/attach buttons, minimap indicators, dialog windows, context menus, and the System Prompt note header.</li>
+                        <li><strong>Solution:</strong> All custom <code>paint</code> methods and stylesheet definitions throughout the application were refactored to source their colors from the new central <code>ColorPalette</code>, making them fully theme-aware. Contrast-detection logic was also added to ensure icon and text colors remain legible on dynamic backgrounds.</li>
+                    </ul>
+                </li>
+                <li><strong>Resolved Critical <code>RuntimeError</code> on Scene Clearing and Chat Loading.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The application would crash with an <code>Internal C++ object already deleted</code> error when clearing the scene to load a new chat. This was caused by <code>QVariantAnimation</code> objects (used for pulsing effects on <code>Container</code>s and <code>Frame</code>s) continuing to run after their parent <code>QGraphicsItem</code> was destroyed.</li>
+                        <li><strong>Solution (Architectural):</strong> The root cause was twofold: animations were instantiated incorrectly, and their lifecycles were not managed during scene cleanup.
+                            <ol>
+                                <li>The <code>QVariantAnimation</code>s were correctly re-instantiated without being parented to the <code>QGraphicsItem</code>s (which are not <code>QObject</code>s).</li>
+                                <li>The <code>itemChange</code> method in both <code>Container</code> and <code>Frame</code> was corrected to reliably detect when an item is being removed from a scene (<code>change == QGraphicsItem.ItemSceneHasChanged and value is None</code>).</li>
+                                <li>In this cleanup path, all active animations and timers (<code>pulse_animation</code>, <code>outline_animation</code>, <code>ghost_frame_timer</code>, <code>cursor_timer</code>) are now explicitly stopped, preventing them from accessing deleted objects.</li>
+                            </ol>
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>Corrected "Ghost Frame" Positioning Logic.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The initial implementation of the ghost frame appeared at an incorrect offset, as it was mixing the container's local coordinates with the scene's global coordinates.</li>
+                        <li><strong>Solution:</strong> The positioning logic in the <code>_show_ghost_frame</code> method was rewritten. It now correctly uses the current global cursor position, maps it to scene coordinates, and then calculates the top-left corner of the preview to ensure it always appears perfectly centered on the user's cursor.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed Recursive Connection Bug with Nested Containers.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> If a <code>Frame</code> was placed inside a <code>Container</code>, moving the outer <code>Container</code> would not update the connections for the nodes inside the nested <code>Frame</code>.</li>
+                        <li><strong>Solution:</strong> The <code>Container</code>'s <code>_update_child_connections</code> method was made recursive. It now uses a new helper method, <code>_get_all_descendant_nodes</code>, to traverse the entire hierarchy of nested items (including other Containers and Frames) to build a complete list of all nodes that require a connection update.</li>
+                    </ul>
+                </li>
             </ul>
         </div>
-
+        
         <div class="changelog-entry">
-            <h3><code>[Beta v.0.6.1]</code></h3>
-            <p class="date">2025-11-01 (Container System & Connection Logic Overhaul)</p>
+            <h3><code>[Beta v.0.6.1]</code> - 2025-11-01 (Container System & Connection Logic Overhaul)</h3>
             <p>This update introduces the <code>Container</code>, a powerful new organizational tool, alongside a critical overhaul of the scene's connection rendering logic. The new <code>Container</code> system allows for complex nesting of any canvas item, while the connection fixes ensure that all visual links behave predictably and consistently, especially when interacting with grouped or collapsed items. This lays a more robust architectural foundation for future layout and interaction features.</p>
             <h4 class="added">Added</h4>
             <ul>
@@ -571,12 +660,911 @@
                         </li>
                     </ul>
                 </li>
+                <li><strong>Corrected Connection Anchor Point Misalignment.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> A visual regression caused a small gap to appear between the start of a connection line and the edge of its source node or container.</li>
+                        <li><strong>Solution:</strong> The issue was traced to an incorrect calculation that used the item's <code>boundingRect()</code> (which can include padding) instead of its precise visual geometry. The connection logic was refined to calculate attachment points based on the item's core visual dimensions, ensuring a pixel-perfect alignment.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.6.0]</code> - 2025-11-01 (Navigational Minimap & Context-Aware Highlighting)</h3>
+            <p>This release introduces a major new UI feature: the Navigational Minimap. This component provides a high-level, interactive "timeline" of the entire chat graph, enabling users to quickly assess the conversation's structure and jump to any point with a single click. To complement this, a new context-aware highlighting system has been implemented to help users maintain their orientation after navigating.</p>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Decoupled the Minimap into a Standalone Module (<code>graphite_minimap.py</code>).</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The initial implementation of the <code>MinimapWidget</code> was placed within <code>graphite_widgets.py</code>, a general-purpose file. This made the code less modular and harder to maintain.</li>
+                        <li><strong>Solution:</strong> All code related to the <code>MinimapWidget</code> has been moved to a new, dedicated <code>graphite_minimap.py</code> file. This enforces a clear separation of concerns, improves project organization, and simplifies future development of the minimap feature. The <code>graphite_view.py</code> file was updated to import the widget from its new location.</li>
+                    </ul>
+                </li>
+                <li><strong>Introduced a <code>scene_changed</code> Signal for Decoupled UI Updates.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> UI components that depend on the scene's state (like the new minimap) previously had no efficient way to know when to refresh their content.</li>
+                        <li><strong>Solution:</strong> A new <code>scene_changed</code> signal was added to the <code>ChatScene</code> class. This signal is now emitted whenever a node is added, removed, moved, or when the layout is reorganized. The <code>MinimapWidget</code> connects to this signal, allowing it to automatically and efficiently stay in sync with the canvas state without being tightly coupled to the scene's internal logic.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Implemented the Navigational Minimap Widget.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> A new, floating UI element now appears on the right side of the main view. It renders a compact, scrollable list of colored notches (green for user, blue for AI) representing every chat node in the conversation.</li>
+                        <li><strong>Interaction:</strong>
+                            <ul>
+                                <li><strong>Hover-to-Preview:</strong> A 500ms hover delay on any notch reveals a tooltip with a preview of the corresponding node's text.</li>
+                                <li><strong>Click-to-Navigate:</strong> Clicking a notch instantly centers the main view on that node.</li>
+                                <li><strong>Scroll Navigation:</strong> Using the mouse wheel while hovering over the minimap scrolls through the list of nodes, with the widget displaying a "viewport" of up to 25 nodes at a time.</li>
+                                <li><strong>Proximity Awareness:</strong> The minimap fades to a lower opacity when the cursor is far away and becomes fully opaque when the cursor is near, keeping it unobtrusive.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li><strong>Created a "Last Visited" Node Highlighter.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> When navigating via the minimap, the previously selected node is now highlighted with a distinct yellow dashed outline.</li>
+                        <li><strong>Purpose:</strong> This provides an immediate visual anchor, allowing users to easily jump back to their previous point of focus after exploring another part of the chat graph. A new <code>is_last_navigated</code> flag was added to the <code>ChatNode</code> to manage this state.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>Optimized Minimap Rendering for Large Graphs.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The initial minimap design mapped each notch's position directly to the node's scene coordinates, creating large gaps for spatially distant nodes.</li>
+                        <li><strong>Solution:</strong> The rendering logic was completely redesigned. The minimap now treats the node list as a compact, ordered sequence. Notches are rendered with even spacing based on their index in the list, ensuring a neat, stacked appearance regardless of the actual node layout on the canvas.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.5.9]</code> - 2025-10-31 (Interactive Welcome Screen & Revamped Startup Experience)</h3>
+            <p>This release fundamentally redesigns the application's startup sequence by introducing a dynamic Welcome Screen. This new dashboard serves as a central hub, providing immediate access to recent projects and an animated carousel of conversation starters to inspire users. The application flow has been re-architected to present this screen alongside the main <code>ChatWindow</code>, creating a more intuitive and powerful initial user experience.</p>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Decoupled the Welcome Screen into a Dedicated Module.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The <code>WelcomeScreen</code> was a high-level application component residing within <code>graphite_widgets.py</code>, a file intended for low-level, reusable UI elements. This created tight coupling and circular import errors.</li>
+                        <li><strong>Solution:</strong> The <code>WelcomeScreen</code> and its related <code>StarterNodeWidget</code> have been moved to a new, dedicated <code>graphite_welcome_screen.py</code> file. This refactoring breaks the circular dependencies, improves modularity, and clarifies the architectural separation between foundational widgets and feature-specific windows.</li>
+                    </ul>
+                </li>
+                <li><strong>Re-architected the Application Startup Flow.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The previous startup sequence was linear: the <code>WelcomeScreen</code> acted as a gatekeeper that would close before opening the main window. The desired behavior was for both windows to co-exist.</li>
+                        <li><strong>Solution:</strong> The logic in <code>graphite_app.py</code> has been rewritten. It now instantiates both the <code>ChatWindow</code> and the <code>WelcomeScreen</code> and passes them to the <code>SplashScreen</code>. After its timeout, the <code>SplashScreen</code> is now responsible for showing both windows, establishing the correct co-existing application state. The <code>WelcomeScreen</code>'s methods were updated to operate on the existing <code>ChatWindow</code> instance rather than creating a new one.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Implemented an Infinitely Cycling "Conversation Starters" Carousel.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> The list of conversation starters on the Welcome Screen now scrolls automatically and infinitely from right to left.</li>
+                        <li><strong>Implementation:</strong> To create a seamless loop, the list of starter nodes is duplicated within the <code>QHBoxLayout</code>. A <code>QTimer</code> is used to incrementally advance the scrollbar's position at a regular interval. When the scroll position reaches the halfway point (the end of the original content), it is silently reset to the beginning, giving the illusion of an endless, continuous animation. The animation also intelligently pauses on mouse hover.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>Redesigned "Conversation Starter" Nodes for Visual Consistency and Readability.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The starter prompts were implemented as standard <code>QPushButtons</code>, which did not wrap text and were stylistically inconsistent with the application's core node-based UI.</li>
+                        <li><strong>Solution:</strong> The <code>QPushButton</code> was replaced with a new custom <code>StarterNodeWidget</code>. This <code>QFrame</code>-based widget is styled to visually mimic the <code>ChatNode</code> found in the main application, featuring a gradient background and a colored border. It contains a <code>QLabel</code> with <code>setWordWrap(True)</code> enabled, ensuring that all prompt text is fully visible and correctly formatted.</li>
+                    </ul>
+                </li>
+                <li><strong>Expanded and Curated the List of Conversation Starters.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The initial list of starter prompts was minimal.</li>
+                        <li><strong>Solution:</strong> The number of prompts has been significantly increased to provide users with a much wider and more inspiring range of ideas to explore, from creative writing and technical questions to productivity and planning tasks.</li>
+                    </ul>
+                </li>
+                <li><strong>Simplified the Welcome Screen UI.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The action buttons at the bottom of the <code>WelcomeScreen</code> (<code>New Chat</code>, <code>Open Library</code>) were redundant, as these functions are readily available in the main <code>ChatWindow</code>.</li>
+                        <li><strong>Solution:</strong> The entire bottom button bar has been removed, resulting in a cleaner, more focused UI that prioritizes recent projects and conversation starters.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.5.8]</code> - 2025-10-31 (Professional Markdown Rendering & Font Customization)</h3>
+            <p>This release introduces a complete overhaul of the text rendering system, replacing the limited custom parser with a professional, standards-compliant Markdown engine. A new Font Control panel has been added, giving users granular control over the typography of the entire canvas for the first time.</p>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Replaced Custom Text Parsing with a Standard Markdown-to-HTML Pipeline.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The previous system used a rudimentary parser for a few custom tags (e.g., <code>[h1]</code>), which was inflexible and did not support common Markdown syntax like multiple heading levels, blockquotes, or lists.</li>
+                        <li><strong>Solution:</strong> The rendering logic in <code>ChatNode</code> has been completely refactored. The <code>TextBlock</code> and custom parsing functions have been removed. The node now utilizes the standard <code>markdown</code> library to convert raw text into HTML, which is then rendered by a <code>QTextDocument</code>. A default CSS stylesheet is applied to the document, ensuring all HTML elements (<code>&lt;h1&gt;</code>, <code>&lt;p&gt;</code>, <code>&lt;ul&gt;</code>, etc.) are styled professionally and consistently.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Implemented a Global Font Control System.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> A new "Font" panel is now available under the "Controls" menu. This UI provides real-time control over the font family, base font size, and text color for all <code>ChatNode</code> and <code>DocumentNode</code> items on the canvas.</li>
+                        <li><strong>Implementation:</strong> A <code>FontControl</code> widget was created with signals for each setting. The <code>ChatScene</code> now manages the global font state and contains new setter methods (<code>setFontFamily</code>, <code>setFontSize</code>, <code>setFontColor</code>). These methods, when triggered by the UI, call a new <code>_update_all_node_fonts</code> function that iterates through all relevant nodes and instructs them to re-render with the new styles.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>Node Architecture Updated to Support Dynamic Styling.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> Nodes were previously unaware of global style changes and would not update after being created.</li>
+                        <li><strong>Solution:</strong> The <code>ChatNode</code> and <code>DocumentNode</code> classes now feature an <code>update_font_settings</code> method, which rebuilds the node's stylesheet and recalculates its geometry. Furthermore, the <code>itemChange</code> method was overridden to detect when a node is added to the scene, immediately applying the scene's current font settings and ensuring style consistency for newly created nodes.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Resolved Critical Rendering Bugs Related to Recent Changes.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> A regression caused user-sent messages to appear as blank nodes. Additionally, a <code>QPainter</code> state error was logged due to improper rendering in the new <code>DocumentNode</code>.</li>
+                        <li><strong>Solution:</strong> The logic in <code>graphite_app.py</code> was corrected to ensure that simple text messages are passed to the <code>ChatNode</code> constructor as a raw string, fixing the blank node issue. The <code>DocumentNode.paint</code> method was corrected to use <code>document.drawContents()</code>, which properly manages the painter's state and resolves the rendering warning.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.5.7]</code> - 2025-10-31 (Ollama Multimodal Support)</h3>
+            <p>This release extends multimodal (text and image) input support to the local Ollama provider, enabling models like <code>qwen3-vl:8b</code> to process visual information. This brings feature parity with the Gemini API provider for a core interaction capability.</p>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Decoupled Message Formatting from API Calls for Ollama.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The <code>api_provider.chat</code> function directly passed its <code>messages</code> argument to the <code>ollama.chat</code> call, which only worked for text-based messages. It lacked the logic to handle the application's internal format for multimodal content (a list of dictionaries for text and image parts).</li>
+                        <li><strong>Solution:</strong> A new message preparation layer has been introduced specifically for the Ollama provider. Before making the API call, the <code>chat</code> function now passes the <code>messages</code> list to a new <code>_prepare_ollama_messages</code> helper function. This function is responsible for transforming the internal message structure into the <code>{'content': '...', 'images': [...]}</code> format required by the <code>ollama-python</code> library, cleanly separating data transformation from the API interaction logic.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Implemented a Dedicated Message Formatter for Ollama Multimodal Payloads.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> The new <code>_prepare_ollama_messages</code> function in <code>api_provider.py</code> now correctly processes mixed-content messages. It iterates through the content parts, aggregates all text into a single string for the <code>content</code> key, and compiles all image byte data into a list for the <code>images</code> key.</li>
+                        <li><strong>Benefit:</strong> This enables seamless support for any multimodal Ollama model (e.g., <code>llava</code>, <code>qwen3-vl:8b</code>) without requiring model-specific logic. The system now automatically handles image data whenever it's present in a user's message, regardless of the selected Ollama model.</li>
+                    </ul>
+                </li>
             </ul>
         </div>
 
         <div class="changelog-entry">
-            <h3><code>[Beta v.0.2.0]</code></h3>
-            <p class="date">2024-05-23</p>
+            <h3><code>[Beta v.0.5.6]</code> - 2025-10-30</h3>
+            <p>This release delivers the first fully functional plugin, "System Prompt," which allows for dynamic, per-conversation customization of the AI agent's behavior. This milestone validates the new plugin architecture and introduces a powerful new layer of user control.</p>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Integrated Node Context into AI Agent Logic for Dynamic System Prompts.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The core <code>ChatWorker</code> was stateless and unaware of the canvas, using a single, hard-coded system prompt for all interactions.</li>
+                        <li><strong>Solution:</strong> The <code>ChatWorker</code> and <code>ChatWorkerThread</code> have been refactored to accept the <code>current_node</code> as context. Before generating a response, the worker now traverses the node's hierarchy to find its root and checks for a connected <code>SystemPromptConnectionItem</code>. If found, it uses the content of the attached <code>Note</code> as the system prompt for that specific API call, effectively overriding the default behavior for that entire conversation branch.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Implemented the "System Prompt" Plugin.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> Users can now add a special "System Prompt" node to any conversation branch via the "Plugins" menu. This node, a specially styled <code>Note</code> item, allows the user to write custom instructions that override the default AI persona for that specific branch.</li>
+                        <li><strong>Implementation:</strong> A new <code>SystemPromptConnectionItem</code> class was created to visually and logically link a <code>Note</code> to a <code>ChatNode</code>. The plugin logic in <code>PluginPortal</code> handles the creation of these items. The core AI agent logic in <code>graphite_agents.py</code> was then updated to detect and utilize these connections, creating a fully integrated and context-aware system.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>Redesigned the System Prompt Connector for Professional Visual Feedback.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The initial version of the <code>SystemPromptConnectionItem</code> was a visually jarring, static dashed line that did not update when nodes were moved.</li>
+                        <li><strong>Solution:</strong> The connector has been completely redesigned. It is now a smooth, S-shaped Bezier curve that dynamically updates its path when connected nodes are moved. A <code>QVariantAnimation</code> was added to create a subtle, continuous pulsing glow effect, visually signifying the flow of instructions from the prompt to the conversation, providing an elegant and intuitive user experience.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Resolved Multiple Critical Crashes Related to the New Plugin System.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> A <code>TypeError</code> occurred because <code>QVariantAnimation</code> was incorrectly parented to a <code>QGraphicsItem</code>. After fixing this, a <code>RuntimeError</code> would occur because the animation was not being stopped when the connection item was deleted, leading it to call methods on a destroyed object.</li>
+                        <li><strong>Solution:</strong> The animation's constructor was corrected to be parentless. More importantly, the <code>itemChange</code> method in <code>SystemPromptConnectionItem</code> was overridden to detect when the item is being removed from the scene. It now explicitly calls <code>.stop()</code> on the animation, properly managing its lifecycle and preventing any further memory-related crashes.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed a Bug Where System Prompt Connectors Would Not Update When Nodes Moved.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The scene's update logic was not aware of the new <code>SystemPromptConnectionItem</code> type, causing the connectors to remain static when their attached nodes were moved.</li>
+                        <li><strong>Solution:</strong> The <code>ChatScene.update_connections</code> method was updated to iterate over and update <code>system_prompt_connections</code>. Additionally, the <code>Note.itemChange</code> method was modified to notify the scene of position changes, ensuring all attached connection types are correctly redrawn.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.5.6]</code> - 2025-10-30 (Canvas Interactivity and Alignment Overhaul)</h3>
+            <p>This update introduces a suite of powerful canvas manipulation features, including grid snapping, smart alignment guides, and orthogonal connection routing. These tools provide users with granular control over node layout and improve the organization of complex graphs.</p>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Centralized Snapping and Alignment Logic into <code>ChatScene</code>.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> Snapping behavior was previously implemented inconsistently within individual <code>QGraphicsItem</code> classes (<code>Note</code>, <code>ChartItem</code>), leading to code duplication and making it impossible to toggle globally.</li>
+                        <li><strong>Solution:</strong> All snapping and alignment logic has been removed from individual items and consolidated into a single, authoritative <code>snap_position</code> method within <code>ChatScene</code>. Movable items now delegate their position changes to this method, which intelligently applies grid snapping and smart guide alignment based on the user's settings.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Implemented "Snap to Grid" Functionality.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> A new "Snap to Grid" checkbox in the "Controls" panel allows users to toggle grid snapping for all movable items. When enabled, dragging an item will cause it to snap to the nearest grid intersection.</li>
+                    </ul>
+                </li>
+                <li><strong>Introduced "Smart Guides" for Dynamic Alignment.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> When the "Smart Guides" checkbox is enabled, moving an item will now display temporary alignment lines. These guides appear when the item's edges or center align with other items on the canvas, enabling precise and intuitive layout adjustments.</li>
+                    </ul>
+                </li>
+                <li><strong>Added "Orthogonal Connections" Routing Option.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> A new "Orthogonal Connections" checkbox in the "Controls" panel switches the main <code>ConnectionItem</code> rendering style. When enabled, connections are drawn as right-angled lines instead of curves, offering a more structured, schematic-like visual appearance.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>Expanded the "Controls" Panel with New Options.</strong>
+                    <ul>
+                        <li><strong>UI:</strong> The <code>GridControl</code> widget has been redesigned to include a new "Alignment & Routing" section, which houses the checkboxes for Snap to Grid, Smart Guides, and Orthogonal Connections.</li>
+                        <li><strong>Behavior:</strong> The "Controls" panel is now hidden by default on application startup to provide a cleaner initial workspace. The corresponding toolbar button's state is correctly set to <code>False</code> on launch.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Resolved a Long-Standing Bug Causing a "Stuck" Panning Cursor.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The panning cursor (a closed hand) would occasionally fail to revert to the default arrow cursor if the middle mouse button was released outside the application window.</li>
+                        <li><strong>Solution:</strong> The <code>mouseMoveEvent</code> in <code>ChatView</code> now includes a state-correction check. It verifies the actual mouse button state against the application's internal panning flag and forcibly resets the cursor if a discrepancy is detected, ensuring the UI state remains synchronized with user actions.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.5.6]</code> - 2025-10-30 (Axiom Demo Mode and Rate Limiting)</h3>
+            <p>This update introduces "Axiom" mode, a pre-configured, rate-limited demonstration of the Gemini API. It allows all users, regardless of license status, to immediately test the application's cloud-based AI capabilities without needing their own API key.</p>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Expanded the Licensing System to Manage Usage-Based Rate Limits.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The <code>LicenseManager</code> was only designed to track perpetual states like trial periods and license validity. It had no mechanism for tracking transient, usage-based metrics.</li>
+                        <li><strong>Solution:</strong> The <code>LicenseManager</code>'s persistent state file (<code>session.dat</code>) has been updated to include an <code>axiom_usage</code> object. This object tracks the number of API calls (<code>count</code>) and the start of a rolling 4-hour window (<code>window_start</code>). New methods (<code>can_use_axiom</code>, <code>record_axiom_usage</code>, <code>get_axiom_reset_time_str</code>) were added to manage this data, ensuring that rate limits are correctly enforced and reset.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Introduced "Axiom" Mode for Instant API Access.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> A new "Axiom" option has been added to the mode selection dropdown. This mode utilizes a hard-coded developer API key for Gemini's <code>gemini-flash-latest</code> model.</li>
+                        <li><strong>Implementation:</strong> The core <code>api_provider</code> was modified to recognize the "Axiom" provider type. When selected, it initializes the Gemini client with the developer key and routes all chat requests to the pre-configured model, bypassing the need for user-provided settings.</li>
+                    </ul>
+                </li>
+                <li><strong>Implemented a Non-Modal Notification Banner for UI Feedback.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> A custom <code>NotificationBanner</code> widget now provides unobtrusive feedback, such as rate-limit warnings. It animates up from the bottom of the window and automatically dismisses after a set duration.</li>
+                        <li><strong>Implementation:</strong> The <code>send_message</code> and <code>regenerate_node</code> methods in <code>ChatWindow</code> now check <code>license_manager.can_use_axiom()</code> before proceeding. If the limit is reached, the new banner is displayed with a message indicating when the limit will reset, preventing a disruptive <code>QMessageBox</code> from appearing.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>Separated User License Status from API Mode Functionality.</strong>
+                    <ul>
+                        <li><strong>Clarification:</strong> The Axiom mode's rate limit of 3 messages per 4 hours applies universally to all users. A user with a paid license who requires unlimited API access is expected to use the "API Endpoint" mode and provide their own key.</li>
+                        <li><strong>Behavior:</strong> The "Settings" button in the toolbar is now disabled when Axiom mode is active, reinforcing that it is a pre-configured demo with no user-editable options.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.5.5]</code> - 2025-10-30</h3>
+            <p>This release introduces a foundational plugin system and refines the main toolbar's visual design for a cleaner, more professional user experience. These changes create a scalable architecture for future features while improving the application's overall aesthetic.</p>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Established a Decoupled Plugin Architecture with a Central <code>PluginPortal</code>.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The application lacked a dedicated, scalable system for adding new tools or features, which would lead to code coupling and maintenance issues.</li>
+                        <li><strong>Solution:</strong> A new <code>graphite_plugin_portal.py</code> module was created, housing a <code>PluginPortal</code> class. This class is responsible for discovering, managing, and executing all plugins. It acts as a clean architectural boundary, allowing new features to be added as self-contained "plugins" without modifying the core application logic. The main window instantiates the portal, providing a controlled context for plugins to interact with the application.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Added a "Plugins" Dropdown Menu to the Main Toolbar.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> A new "Plugins" menu now appears on the main toolbar, providing a centralized and user-accessible entry point for all integrated tools and extensions.</li>
+                        <li><strong>Implementation:</strong> The <code>setup_toolbar</code> method in <code>graphite_app.py</code> was updated to include a <code>QComboBox</code> for plugins. This dropdown is dynamically populated with a list of available plugins retrieved from the <code>PluginPortal</code>. Selecting an item triggers the execution of the corresponding plugin and resets the menu, creating an intuitive action-oriented experience.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>Refined Toolbar UI for a Cleaner, More Professional Aesthetic.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The main toolbar buttons used solid background colors, which appeared dated and visually busy. Furthermore, the newly added "Plugins" menu was initially implemented as a <code>QToolButton</code>, creating a visual inconsistency with the adjacent <code>QComboBox</code> used for mode selection.</li>
+                        <li><strong>Solution:</strong> The stylesheets in <code>graphite_app.py</code> and <code>graphite_styles.py</code> were updated to give toolbar buttons a transparent background by default. Color is now used exclusively to provide feedback on hover, creating a minimalist and modern appearance. The "Plugins" menu was re-implemented as a <code>QComboBox</code> to perfectly match the "Mode" selector, ensuring a visually cohesive and professional toolbar design.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.5.4]</code> - 2025-10-30</h3>
+            <p>This release overhauls the canvas grid system, transforming it from a static background pattern into a dynamic, professional, and fully customizable visual tool. The new grid adapts to the user's zoom level and offers multiple styles for a personalized workspace.</p>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Added Comprehensive Grid Customization Options.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> Users can now fully personalize the canvas grid. The <code>GridControl</code> widget has been expanded to include new options for changing the grid's visual style (Dots, Lines, or Cross) and its color, in addition to the existing size and opacity controls.</li>
+                        <li><strong>Implementation:</strong> The <code>GridControl</code> widget in <code>graphite_widgets.py</code> was updated with new UI buttons and state variables (<code>grid_style</code>, <code>grid_color</code>). The <code>drawBackground</code> method in <code>ChatView</code> now reads these properties to render the grid accordingly.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>Overhauled Grid Rendering to be Dynamic and Zoom-Aware.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The previous grid was a simple, static dotted line pattern that did not adapt to the user's zoom level. This resulted in visual clutter when zoomed out and a lack of detail when zoomed in, creating an unprofessional appearance.</li>
+                        <li><strong>Solution:</strong> The <code>drawBackground</code> method in <code>ChatView</code> has been completely rewritten. It now renders a multi-level grid with distinct "major" and "minor" lines. These lines intelligently appear and disappear at different zoom thresholds (<code>LOD_MAJOR</code>, <code>LOD_MINOR</code>), and their thickness scales appropriately. This provides a clean, professional-grade drafting experience that is always visually suitable for the current level of detail.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.5.3]</code> - 2025-10-30</h3>
+            <p>This is a major stability and usability release that restores critical functionality, overhauls key UI components, and refactors core systems for improved modularity. The "Navigation Pins" panel has been completely re-architected into a true floating overlay, and the "Create Frame" feature has been robustly re-implemented.</p>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Re-architected the "Navigation Pins" Panel as a True Floating Overlay.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The <code>PinOverlay</code> was previously embedded directly into the main window's layout, permanently consuming screen real estate and creating an intrusive user experience. Its internal collapse logic was flawed and buggy.</li>
+                        <li><strong>Solution:</strong> The <code>PinOverlay</code> has been completely re-architected. It is now a child of the <code>ChatView</code>, making it a true floating overlay that sits <em>on top</em> of the canvas. Its visibility is now controlled by a dedicated "Pins" button in the main toolbar, providing a global and reliable toggle. All internal collapse/expand logic has been removed in favor of this superior architecture.</li>
+                    </ul>
+                </li>
+                <li><strong>Centralized Command Palette Functionality into a Dedicated Module.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The logic for the command system was split between <code>graphite_core.py</code> (for <code>CommandManager</code>) and <code>graphite_dialogs.py</code> (for <code>CommandPaletteDialog</code>), hindering maintainability.</li>
+                        <li><strong>Solution:</strong> Both classes have been moved into a new, dedicated <code>graphite_command_palette.py</code> module. This encapsulation improves modularity and simplifies future development of the command system.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Re-enabled "Create Frame" with a New Shortcut (<code>Ctrl+G</code>) and Command Palette Integration.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> Users can now once again create frames around selected nodes. This core organizational feature is accessible via the new <code>Ctrl+G</code> shortcut and is discoverable in the Command Palette (<code>Ctrl+K</code>) as "Create Frame From Selection."</li>
+                        <li><strong>Implementation:</strong> The feature was re-implemented using a global <code>QShortcut</code>, which bypasses any potential event conflicts. The command was also registered with the <code>CommandManager</code>, with a corrected condition that makes it available whenever one or more nodes are selected.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>Redesigned and Resized the "Navigation Pins" Panel for Professionalism and Usability.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The panel's visual design was inconsistent, too small to be functional, and lacked a conventional close button.</li>
+                        <li><strong>Solution:</strong> The panel's styling has been meticulously updated to match the elegant, floating design of the <code>CommandPalette</code>. Its default size has been significantly increased, and a dedicated "Close" button has been added to its header. This button correctly interacts with the main toolbar toggle via a signal-and-slot mechanism, ensuring a conventional and intuitive user experience.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Fixed a series of critical bugs that made the "Navigation Pins" panel unusable.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The panel's internal collapse button would disappear, making it impossible to re-expand. After being re-architected, the new external close button would then cause a fatal <code>AttributeError</code> crash.</li>
+                        <li><strong>Solution:</strong> The entire flawed collapse mechanism was removed. The crash was resolved by implementing a proper signal-and-slot connection between the panel's "Close" button and the main window, fully decoupling the components and ensuring robust operation.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed a critical regression where the "Create Frame" feature was completely inaccessible.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> A shortcut conflict (<code>Ctrl+F</code> being reassigned to "Find") and an incorrect command palette condition made it impossible to create frames.</li>
+                        <li><strong>Solution:</strong> The conflicting event handler was removed, a new, unambiguous shortcut (<code>Ctrl+G</code>) was assigned via <code>QShortcut</code>, and the command's availability condition was corrected, fully restoring the feature.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed a visual bug where <code>CodeNode</code> connections would not update when moving a parent <code>Frame</code>.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> When a <code>Frame</code> was moved or resized, the dashed lines connecting <code>CodeNode</code>s would remain frozen in their original positions.</li>
+                        <li><strong>Solution:</strong> The <code>Frame.mouseMoveEvent</code> method was updated to correctly iterate through and update all connection types (<code>connections</code> and <code>content_connections</code>), ensuring all lines are redrawn properly during transformations.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed a fatal <code>ImportError</code> crash on startup.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The refactoring of the Command Palette into its own module was incomplete, as the main application was still trying to import classes from their old locations.</li>
+                        <li><strong>Solution:</strong> All import statements in <code>graphite_app.py</code> were updated to correctly reference the new <code>graphite_command_palette.py</code> module, resolving the crash.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.5.1]</code> - 2025-10-30</h3>
+            <p>This release improves the user's ability to customize their workspace by adding a feature to toggle the visibility of on-canvas controls. It also resolves a critical UI layout bug that affected the application's initial appearance.</p>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Added the Ability to Show/Hide On-Canvas View Controls.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> Users can now hide or show the on-canvas widgets for adjusting grid settings and drag sensitivity. This allows for a cleaner, less cluttered workspace when these controls are not needed.</li>
+                        <li><strong>Implementation:</strong> A new checkable "Controls" button has been added to the main toolbar. This button is connected to a new <code>toggle_overlays_visibility()</code> method in the <code>ChatView</code> class, which manages the visibility of the <code>GridControl</code> and drag sensitivity widgets. The layout logic was also updated to ensure other overlays (like the search bar) correctly reposition themselves when the controls are hidden.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Fixed a critical UI bug where view control widgets were incorrectly positioned at the top-left on startup.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> On initial application launch, the <code>GridControl</code> and drag sensitivity widgets would appear stacked at the <code>(0,0)</code> coordinate of the view instead of their correct top-right position. The layout would only correct itself after user interaction.</li>
+                        <li><strong>Solution:</strong> The root cause was identified as a layout timing issue. The initial positioning logic was being called before the <code>ChatView</code> had received its final geometry from the main window. The fix involved overriding the <code>showEvent</code> method in <code>ChatView</code>. This ensures that the initial positioning of the overlays is now performed only once, at the moment the view is first displayed and guaranteed to have a valid, stable size, resolving the visual bug completely.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.5.0]</code> - 2025-10-30</h3>
+            <p>This release introduces a centralized "New Chat" command, improving accessibility and standardizing session management. This update also adds dynamic window titles for better user context and completes a robust refactoring of the session clearing logic.</p>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Added a Universal "New Chat" Command and Shortcut (Ctrl+T).</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> Users can now start a new chat session instantly from anywhere in the application, either by pressing the <code>Ctrl+T</code> keyboard shortcut or by searching for "New Chat" in the command palette (<code>Ctrl+K</code>).</li>
+                        <li><strong>Implementation:</strong> The logic for creating a new chat has been centralized into a new <code>new_chat()</code> method within the main <code>ChatWindow</code> class. This method is now registered with the <code>CommandManager</code> and linked to a new <code>QShortcut</code>, making it a globally accessible action.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>The Main Window Title is now Dynamic and Displays the Current Chat Name.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The window title was static and did not provide context about the currently loaded chat session.</li>
+                        <li><strong>Solution:</strong> A new <code>update_title_bar()</code> method has been implemented in <code>ChatWindow</code>. This method dynamically constructs the window title by combining the application name with the title of the current chat session (if one is loaded) and the license status. This method is now called whenever a new chat is created or an existing one is loaded, providing immediate and clear context to the user.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Centralized and Hardened the "New Chat" Session Clearing Logic.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The original logic for starting a new chat was located within the <code>ChatLibraryDialog</code> and was incomplete. It would clear the main <code>ChatScene</code> but failed to reset other critical state variables and UI elements, such as the <code>current_node</code> reference, message input placeholder, and various lists within the scene (<code>code_nodes</code>, <code>pins</code>, etc.).</li>
+                        <li><strong>Solution:</strong> All session clearing logic has been consolidated into the new <code>ChatWindow.new_chat()</code> method. This method now performs a comprehensive reset of the application state, including explicitly clearing all item lists within the <code>ChatScene</code>, resetting the <code>current_node</code> reference in the main window, and updating the UI to its default state, ensuring a clean and reliable transition between sessions.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.4.9]</code> - 2025-10-29</h3>
+            <p>This release addresses critical bugs in the "Regenerate Response" feature and introduces a new, context-aware loading animation that significantly improves the user experience during AI operations.</p>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Added a Contextual, Node-Specific Loading Animation.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> The previous full-screen, text-based loading overlay has been replaced with a visually appealing, animated spinner that appears directly next to the node awaiting a response. This provides clear, non-disruptive feedback, indicating exactly which part of the conversation is being processed.</li>
+                        <li><strong>Implementation:</strong> A new <code>LoadingAnimation</code> class, inheriting from <code>QGraphicsObject</code>, was created in <code>graphite_widgets.py</code>. This class uses <code>QPropertyAnimation</code> to render a smooth, multi-arc spinning animation. The main <code>ChatWindow</code> logic was refactored to instantiate this item on the <code>ChatScene</code> and position it adjacent to the source node whenever a background AI task (e.g., sending a message, regenerating, creating a chart) is initiated.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Fixed a critical logic error where "Regenerate Response" would fail due to missing context.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The regeneration feature was incorrectly providing the model with the conversation history of the node <em>being replaced</em>, which lacked the essential preceding user query. This caused the model to have zero context, resulting in irrelevant or nonsensical regenerated responses.</li>
+                        <li><strong>Solution:</strong> The logic in <code>ChatWindow.regenerate_node()</code> has been corrected. It now correctly and robustly fetches the <code>conversation_history</code> from the parent node of the node being regenerated. This ensures the model always receives the full and accurate conversational context, including the original query it needs to answer again.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed a fundamental architectural bug where regenerating a response would break its connection to the conversation branch.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The previous implementation would delete the original node and create a new one, visually and contextually severing it from its place in the conversation graph.</li>
+                        <li><strong>Solution:</strong> The regeneration logic has been completely re-architected. Instead of deleting and recreating the node, the <code>handle_regenerated_response</code> method now updates the existing <code>ChatNode</code> in-place. A new <code>update_content</code> method was added to the <code>ChatNode</code> class to handle the replacement of its text, history, and associated <code>CodeNode</code>s, fully preserving its position and connections within the graph.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed a fatal <code>TypeError</code> crash caused by an incorrect class inheritance in the new <code>LoadingAnimation</code>.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The <code>LoadingAnimation</code> was initially created by inheriting from <code>QGraphicsItem</code>, which is not a <code>QObject</code> subclass and therefore cannot be animated with <code>QPropertyAnimation</code>, causing the application to crash.</li>
+                        <li><strong>Solution:</strong> The <code>LoadingAnimation</code> class was corrected to inherit from <code>QGraphicsObject</code>, which is the proper Qt class for graphics items that require support for signals, slots, and properties, resolving the crash.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed a <code>NameError</code> crash in <code>graphite_widgets.py</code> due to a missing import.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The <code>LoadingAnimation</code> class used <code>QRectF</code> without importing it, causing a crash whenever it was instantiated.</li>
+                        <li><strong>Solution:</strong> The missing <code>QRectF</code> class has been added to the import statement from <code>PySide6.QtCore</code>, resolving the error.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.4.8]</code> - 2025-10-29</h3>
+            <p>This release introduces a major new feature for handling and displaying code, significantly improving the user experience for developers and technical users. AI-generated responses containing code blocks are now automatically parsed and rendered in a dedicated, syntax-highlighted <code>CodeNode</code>, visually separating them from conversational text.</p>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Added Automatic Code Block Detection and Syntax Highlighting.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> The application can now automatically detect markdown-style code blocks (e.g., <code>```python...```</code>) in AI responses. Each detected block is rendered in a new, specialized <code>CodeNode</code> with full syntax highlighting, powered by the <code>pygments</code> library. This makes code significantly easier to read, understand, and copy.</li>
+                        <li><strong>Implementation:</strong>
+                            <ul>
+                                <li>A new <code>CodeNode</code> class was created in <code>graphite_node.py</code>, which uses a <code>QTextDocument</code> to render HTML generated by <code>pygments</code>, providing rich, styled text.</li>
+                                <li>The <code>handle_response</code> method in <code>graphite_app.py</code> was updated with a regex-based parser to intelligently split incoming AI responses into separate text and code segments.</li>
+                                <li>A new <code>ContentConnectionItem</code> was added to <code>graphite_items.py</code> to create a distinct visual link (a dashed line) between a parent <code>ChatNode</code> and its child <code>CodeNode</code>, clarifying their relationship.</li>
+                                <li>The <code>ChatSessionManager</code> was enhanced to serialize and deserialize the new <code>CodeNode</code>s and their connections, ensuring they are saved and loaded correctly with the chat graph.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Integrated <code>pygments</code> for Robust Syntax Highlighting.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> Displaying code as plain text is difficult to read and unprofessional. A robust, extensible solution for code rendering was needed.</li>
+                        <li><strong>Solution:</strong> The <code>pygments</code> library has been integrated as a core dependency. A new <code>CodeHighlighter</code> utility class was added to <code>graphite_node.py</code> to abstract the highlighting logic. This class dynamically generates CSS and HTML from Python code, supporting a wide range of languages and providing a high-quality, professional rendering experience within the new <code>CodeNode</code>. The system is designed to fall back gracefully to plain text if a language is not specified or recognized.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.4.7]</code> - 2025-10-29</h3>
+            <p>This release introduces the Command Palette, a major new usability feature that provides fast, keyboard-driven access to nearly all application functions. This update also includes a key architectural refactoring of item deletion logic, centralizing it to support the new command system and improve maintainability.</p>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Added the Command Palette for Quick, Keyboard-Driven Actions (Ctrl+K).</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> Users can now press <code>Ctrl+K</code> to open a searchable command palette, similar to those found in modern code editors. This provides instant, text-based access to a wide range of actions, such as "Collapse All Nodes," "Delete Selected Items," "Generate Bar Chart," and "Fit All to View," dramatically speeding up user workflow.</li>
+                        <li><strong>Implementation:</strong> The feature is powered by a new <code>CommandManager</code> class (<code>graphite_core.py</code>) responsible for registering commands, their aliases, and context-sensitive availability (e.g., "Delete Selected" is only available when items are selected). A new <code>CommandPaletteDialog</code> (<code>graphite_dialogs.py</code>) provides the search UI, and the main <code>ChatWindow</code> now registers all core application functions as commands.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Refactored and Centralized Item Deletion Logic.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> Previously, the logic for deleting different item types was fragmented across the codebase. The complex logic for deleting a <code>ChatNode</code> (which involves re-parenting its children) was located exclusively within its context menu, making it non-reusable for a global "Delete Selected" command.</li>
+                        <li><strong>Solution:</strong> All deletion logic has been centralized within the <code>ChatScene</code> class. The <code>ChatNode</code> deletion algorithm was moved into a new <code>delete_chat_node</code> method. The primary <code>deleteSelectedItems</code> method was enhanced to iterate through all selected items and call the correct deletion function for each type (<code>ChatNode</code>, <code>Frame</code>, <code>Note</code>, etc.). This refactoring was essential for implementing the unified "Delete Selected Items" command in the new Command Palette.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.4.6]</code> - 2025-10-29</h3>
+            <p>This release introduces a powerful new usability feature for focusing on specific conversation paths and completes a significant architectural refactoring to improve modularity and resolve critical import errors.</p>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Added "Hide Other Branches" Feature to Focus on Specific Conversations.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> Users can now right-click any node and select "Hide Other Branches" from the context menu. This action visually dims and de-emphasizes all nodes that are not part of the selected node's direct lineage (i.e., its ancestors and descendants). This allows users to instantly focus on a single, coherent line of thought within a complex, branching graph.</li>
+                        <li><strong>Implementation:</strong> The feature is managed by a new state variable and a <code>toggle_branch_visibility()</code> method within the <code>ChatScene</code> class. When activated, the method traces the full path of the selected branch and sets an <code>is_dimmed</code> flag on all other nodes. The rendering logic in <code>ChatNode</code> was updated to draw a semi-transparent overlay when this flag is active. The context menu dynamically updates to "Show All Branches," allowing the user to easily restore the view.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Decomposed the monolithic <code>graphite_items.py</code> module for improved modularity.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The <code>graphite_items.py</code> file was responsible for both general-purpose canvas items (like <code>Frame</code>, <code>Note</code>, <code>Pin</code>) and the highly complex, multi-component <code>ChatNode</code>. This violated the Single Responsibility Principle and made the codebase harder to navigate and maintain.</li>
+                        <li><strong>Solution:</strong> All classes directly related to the chat node functionality have been extracted into a new, dedicated <code>graphite_node.py</code> file. This includes <code>ChatNode</code>, <code>TextBlock</code>, <code>ImageBlock</code>, <code>ScrollBar</code>, and <code>ChatNodeContextMenu</code>. This refactoring clarifies the separation of concerns, with <code>graphite_items.py</code> now serving as a library for generic canvas elements and <code>graphite_node.py</code> encapsulating all chat node logic.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Fixed a fatal application crash (<code>ImportError</code>) caused by a circular dependency.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The architectural refactoring inadvertently created a circular import loop where <code>graphite_node.py</code> imported <code>graphite_items.py</code>, which in turn imported <code>graphite_node.py</code>, causing the application to crash on startup.</li>
+                        <li><strong>Solution:</strong> The unnecessary import of <code>ChatNode</code> from <code>graphite_items.py</code> was identified and removed. The classes within <code>graphite_items.py</code> do not need compile-time knowledge of <code>ChatNode</code>, as they operate on instances passed at runtime. Removing this import successfully broke the dependency cycle and restored application stability.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.4.5]</code> - 2025-10-29</h3>
+            <p>This release addresses several significant visual and architectural flaws within the <code>ChatNode</code> component that were introduced in the previous version. The primary focus was on creating a robust and permanent solution to the layout conflicts between the text content, the scrollbar, and the collapse/expand button, ensuring a clean and professional UI under all conditions.</p>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Fixed a critical UI rendering bug where the collapse/expand button would overlap the text content.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> Previous attempts to fix the layout resulted in a state where, if a node's content was <em>not</em> long enough to require a scrollbar, the collapse button would be drawn directly on top of the text field.</li>
+                        <li><strong>Solution:</strong> The rendering and layout architecture of the <code>ChatNode</code> has been fundamentally corrected. A permanent, reserved space ("gutter") is now established on the right side of every node. The text layout logic was updated to <em>never</em> enter this gutter, guaranteeing that its content can never overlap with UI controls. The button's positioning logic was then simplified to reliably place it within this safe, reserved area, resolving the conflict in all states.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed a major regression where the scrollbar would overlap the collapse button.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> An incorrect fix for the text overlap issue reintroduced the original bug where the scrollbar and collapse button would render on top of each other, making both components difficult to use.</li>
+                        <li><strong>Solution:</strong> The <code>paint</code> method was corrected to implement a strict, state-dependent positioning rule. It now explicitly checks if the scrollbar is visible. If it is, the button is placed to the left of the scrollbar; otherwise, it is placed at the far-right edge of the node. This dual-state logic ensures the two components can never occupy the same space.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed a fatal application crash (<code>QPainter::end: Painter ended with 2 saved states</code>) and disappearing nodes.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> An incorrect attempt to fix the rendering order led to a critical painter state imbalance, where <code>painter.save()</code> was called without a corresponding <code>painter.restore()</code>. This corrupted the Qt rendering pipeline, causing the application to crash and <code>ChatNode</code> items to fail to render entirely.</li>
+                        <li><strong>Solution:</strong> The <code>paint</code> method has been corrected to use a properly balanced <code>painter.save()</code>/<code>painter.restore()</code> block. This block now safely encapsulates the clipping and drawing of the text content, ensuring the painter state is always correctly managed and preventing any rendering crashes or visual corruption.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.4.4]</code> - 2025-10-28</h3>
+            <p>This release enhances canvas usability by introducing a node collapse feature, allowing users to manage complex conversation graphs more effectively. It also includes fixes for visual artifacts that appeared as a result of the new functionality.</p>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Added Node Collapse/Expand Functionality.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> Users can now minimize nodes to a compact state, reducing visual clutter and making it easier to navigate large, branching conversations. This is a crucial tool for focusing on specific thought threads while hiding less relevant ones.</li>
+                        <li><strong>Implementation:</strong> The <code>ChatNode</code> class now manages a <code>is_collapsed</code> state. The feature is accessible via two intuitive methods: a new "Collapse/Expand" option in the right-click context menu, and a hover-activated icon that appears in the top-right corner of the node for quick, direct interaction. When a node's state is changed, all associated connections and parent frames automatically adjust to the new geometry.</li>
+                    </ul>
+                </li>
+                <li><strong>Added Persistence for Node Collapse State.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> The collapsed or expanded state of every node is now saved with the chat session and is fully restored when the session is loaded.</li>
+                        <li><strong>Implementation:</strong> The <code>ChatSessionManager</code> has been updated to serialize the <code>is_collapsed</code> boolean for each node into the database and deserialize it upon loading, ensuring a consistent and predictable layout across sessions.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Fixed a critical UI bug where the scrollbar remained visible on collapsed nodes.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> When a node with scrollable content was collapsed, its scrollbar was not being hidden, leaving a detached and visually disruptive UI element on the canvas.</li>
+                        <li><strong>Solution:</strong> The logic in the <code>ChatNode._update_geometry_for_state()</code> method has been corrected to explicitly set the <code>ScrollBar</code>'s visibility to <code>False</code> whenever the node enters a collapsed state, completely resolving the visual artifact.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.4.3]</code> - 2025-10-28</h3>
+            <p>This is a minor release focused on improving the core visual aesthetic of the application's chat canvas, moving from a flat design to one with more perceived depth and professionalism.</p>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>Enhanced the visual design of <code>ChatNode</code> items for a more professional aesthetic.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The previous design used solid, flat colors (green and blue) for the node backgrounds. While functional, this created a visually simplistic and less polished look.</li>
+                        <li><strong>Solution:</strong> The node's rendering logic in the <code>ChatNode.paint()</code> method has been updated. The solid color fill has been replaced with a subtle gray gradient, giving the nodes a sense of depth. The node's origin (user or AI) is now indicated by a colored outline (green for user, blue for AI) rather than the entire background, resulting in a cleaner and more professional appearance.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.4.2]</code> - 2025-10-27</h3>
+            <p>This release completes the major UI overhaul by standardizing all window frames across the application, resulting in a more professional and cohesive user experience. The focus was on eliminating custom, non-native windowing solutions in favor of robust, OS-level implementations.</p>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>Unified the Main Window and all Dialogs to use Native OS Window Frames.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The main application window and several key dialogs (<code>Library</code>, <code>Help</code>, <code>About</code>, <code>Activation</code>) were using a custom, frameless implementation that required significant boilerplate code to replicate basic window functions. This created a visual and functional disconnect from standard dialogs and lacked the robustness of native window management.</li>
+                        <li><strong>Solution:</strong> All custom frameless window implementations have been removed and replaced with standard, native window frames. The <code>CustomTitleBar</code> class is now obsolete, and all windows now leverage the host operating system's window manager for a consistent look, feel, and behavior (including features like window snapping and native shadows).</li>
+                    </ul>
+                </li>
+                <li><strong>Improved User Help Dialog Content.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The descriptions in the "Help" dialog were overly brief and often failed to explain <em>how</em> or <em>why</em> a feature should be used, limiting their value for new users.</li>
+                        <li><strong>Solution:</strong> All help text has been rewritten to be more detailed, descriptive, and action-oriented. The new content provides clear, step-by-step instructions, explains core application concepts (like "Contextual Replies"), and includes keyboard shortcuts to improve feature discovery and user onboarding.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Fixed a critical bug where the native close ("x") button was disabled on all refactored windows.</strong>
+                    <ul>
+                        <li><strong>Details:</strong> The process of removing the custom frameless hints inadvertently dropped the <code>WindowCloseButtonHint</code> flag, causing the window manager to disable the close button. This flag has been explicitly re-added to the main window and all refactored dialogs, restoring essential functionality.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed an architectural flaw by relocating the main window icon logic.</strong>
+                    <ul>
+                        <li><strong>Details:</strong> The application's primary icon was being incorrectly set from within the now-obsolete <code>CustomTitleBar</code> class. This logic has been moved to the main <code>ChatWindow</code>'s <code>__init__</code> method, where it properly belongs.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.4.1]</code> - 2025-10-27</h3>
+            <p>This release is a continuation of the major architectural refactoring initiated in the previous version. The focus was to dismantle the large <code>graphite_graphics.py</code> file, further improving modularity and clarifying the separation between UI components.</p>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Decomposed the monolithic <code>graphite_graphics.py</code> module.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> Following the initial UI refactor, the <code>graphite_graphics.py</code> module remained overly large, containing both the individual graphical items (<code>ChatNode</code>, <code>Frame</code>, <code>Note</code>) and the container classes that manage them (<code>ChatScene</code>, <code>ChatView</code>). This co-location of distinct responsibilities hindered clarity and maintainability.</li>
+                        <li><strong>Solution:</strong> The single file has been broken down into two new, more focused modules, establishing a clearer hierarchy between the view and its contents:
+                            <ul>
+                                <li><code>graphite_items.py</code>: This module now exclusively contains all <code>QGraphicsItem</code> subclasses. These classes represent the individual, interactive elements on the canvas (<code>ChatNode</code>, <code>ConnectionItem</code>, <code>Frame</code>, <code>Note</code>, <code>ChartItem</code>, <code>NavigationPin</code>, etc.).</li>
+                                <li><code>graphite_view.py</code>: This module houses the container classes (<code>ChatScene</code> and <code>ChatView</code>), which are responsible for managing, displaying, and orchestrating interactions with the graphical items.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Fixed a critical <code>ImportError</code> crash caused by a circular dependency.</strong>
+                    <ul>
+                        <li><strong>Details:</strong> The refactoring process inadvertently created a circular import loop: <code>graphite_widgets</code> imported <code>graphite_items</code>, which imported <code>graphite_dialogs</code>, which in turn imported <code>graphite_widgets</code>, causing the application to crash on startup. The issue was resolved by restoring a "dummy class" forward declaration for <code>NavigationPin</code> within <code>graphite_widgets.py</code>, successfully breaking the import cycle.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.4.0]</code> - 2025-10-27</h3>
+            <p>This release introduces a major architectural refactoring of the user interface layer. The primary goal was to dismantle the monolithic <code>graphite_ui.py</code> file to improve modularity, resolve circular dependency issues, and enhance long-term maintainability.</p>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Decomposed the monolithic UI module.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The <code>graphite_ui.py</code> file had grown to include over 25 distinct classes, mixing responsibilities such as styling, core widgets, dialogs, and complex graphics scene items. This made the code difficult to navigate, debug, and maintain.</li>
+                        <li><strong>Solution:</strong> The single file has been broken down into four new, single-responsibility modules:
+                            <ul>
+                                <li><code>graphite_styles.py</code>: Centralizes the <code>StyleSheet</code> class and color constants.</li>
+                                <li><code>graphite_widgets.py</code>: Contains reusable <code>QWidget</code> subclasses like <code>CustomTitleBar</code>, <code>LoadingOverlay</code>, and <code>PinOverlay</code>.</li>
+                                <li><code>graphite_dialogs.py</code>: Consolidates all <code>QDialog</code>-based classes.</li>
+                                <li><code>graphite_graphics.py</code>: Contains all core <code>QGraphics...</code> components, including custom items, the <code>ChatScene</code>, and the <code>ChatView</code>.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Fixed multiple critical <code>ImportError</code> crashes</strong> that arose during the refactoring process.
+                    <ul>
+                        <li><strong>Details:</strong> Resolved errors caused by incorrect import paths for Qt classes. <code>QAction</code> was moved from <code>QtWidgets</code> to its correct module, <code>QtGui</code>. The class <code>QGraphicsPathStroker</code> was corrected to its proper name, <code>QPainterPathStroker</code>, fixing both the import and its usage within the <code>ConnectionItem</code> class.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed a <code>TypeError</code> crash related to the Frame animation.</strong>
+                    <ul>
+                        <li><strong>Details:</strong> The <code>valueChanged</code> signal of the <code>QVariantAnimation</code> used for the frame's selection outline was incorrectly connected to the <code>QGraphicsItem.update</code> method, passing an unexpected argument. This was resolved by using a <code>lambda</code> function to ensure the method is called without arguments, stopping the crash loop.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.3.0]</code> - 2025-10-27</h3>
+            <p>This release transitions the application from a purely functional prototype to a distributable product by introducing a robust licensing and user agreement framework. The primary focus is on ensuring a professional first-run experience, protecting the software with a trial period, and providing clear developer attribution.</p>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Added a 5-Day Trial and Licensing System.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> The application now operates in a fully-featured demo mode for 5 days from the first launch. After the trial period expires, the user must enter a valid license key to continue using the software.</li>
+                        <li><strong>Implementation:</strong> A new <code>graphite_licensing.py</code> module has been created to manage all licensing logic. It creates a persistent state file (<code>~/.graphite/session.dat</code>) to securely track the first launch date, EULA acceptance, and activation status. The main application startup sequence in <code>graphite_app.py</code> has been modified to enforce these checks before the main window is launched.</li>
+                    </ul>
+                </li>
+                <li><strong>Added a Mandatory End-User License Agreement (EULA).</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> On the very first launch, users are now presented with a modal EULA dialog. The application will not run unless the user scrolls to the bottom and explicitly agrees to the terms, which include a disclaimer of warranty and a liability clause for generated content.</li>
+                        <li><strong>Implementation:</strong> A new <code>EULADialog</code> was created in <code>graphite_ui.py</code> with logic to ensure full review of the text. The <code>LicenseManager</code> tracks the acceptance state, preventing the app from running until the EULA is accepted.</li>
+                    </ul>
+                </li>
+                <li><strong>Added an "About" Dialog and Developer Credits.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> A new "About" dialog is now accessible from the main toolbar, providing users with application version info, developer credits (name, contact), and a direct link to the project's GitHub repository. It also clearly displays the current license status (Trial, Licensed, or Expired).</li>
+                        <li><strong>Implementation:</strong> An <code>AboutDialog</code> class was added to <code>graphite_ui.py</code> and integrated into the <code>ChatWindow</code> toolbar.</li>
+                    </ul>
+                </li>
+                <li><strong>Added an In-App Activation Dialog.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> Users can now activate their software from within the application using a dedicated "Activate" dialog, which appears automatically when the trial expires or can be accessed from the toolbar.</li>
+                        <li><strong>Implementation:</strong> The <code>ActivationDialog</code> class in <code>graphite_ui.py</code> provides an interface for key entry and validation against the logic in <code>graphite_licensing.py</code>.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>The Main Window Title is now dynamic and reflects the license status.</strong> The title bar will display "Graphite (Trial - X days remaining)" during the trial period and "Graphite (Licensed)" after successful activation, providing clear and persistent feedback to the user.</li>
+                <li><strong>The main toolbar has been updated</strong> to include buttons for the new "About" and "Activate" dialogs, making these features easily accessible.</li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Fixed a bug in the EULA dialog where the "Agree" button would remain disabled</strong> if the agreement text was too short to require scrolling. The logic was corrected to enable the button immediately if the content is fully visible upon opening, ensuring a smooth user experience regardless of screen resolution or content length.</li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.2.2]</code> - 2024-05-25</h3>
+            <p>This release introduces support for any OpenAI-compatible API endpoint as an alternative to a local Ollama instance. It also includes a significant user experience overhaul for model and provider selection, resolving critical design flaws and improving usability.</p>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Added support for OpenAI-Compatible API Endpoints.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> Users can now switch from using a local Ollama instance to any remote API service that is compatible with the OpenAI API specification (e.g., OpenAI, Groq, OpenRouter, or self-hosted solutions like LiteLLM). (Credits for first conceptual buildout/iteration of implimentations - https://github.com/1818TusculumSt)</li>
+                        <li><strong>Implementation:</strong> A new <code>api_provider.py</code> module was created to act as a router, abstracting all LLM calls and directing them to either Ollama or the configured API endpoint based on the user's selection. All agent classes (<code>ChatAgent</code>, <code>KeyTakeawayAgent</code>, etc.) were refactored to use this new provider instead of calling <code>ollama</code> directly.</li>
+                    </ul>
+                </li>
+                <li><strong>Added Per-Task Model Configuration for API Mode.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> When using an API provider, users can configure different models for different tasks (Title Generation, Chat/Analysis, and Chart Data Extraction) to optimize for cost, speed, and capability.</li>
+                        <li><strong>Implementation:</strong> An <code>APISettingsDialog</code> was created, allowing users to enter their API credentials, load a list of available models from the endpoint, and assign a specific model to each task category.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>Overhauled the Model and Provider Selection UX.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The previous UI design for model selection was confusing, with separate and sometimes hidden buttons for different providers. This created a frustrating and non-discoverable user experience.</li>
+                        <li><strong>Solution:</strong> The toolbar has been redesigned with a clear, two-part system:
+                            <ol>
+                                <li>A "Mode" dropdown to explicitly select the provider (<code>Ollama (Local)</code> or <code>API Endpoint</code>).</li>
+                                <li>A single, consistently visible "Settings" button. This button is now context-aware and will open the appropriate configuration dialog (<code>ModelSelectionDialog</code> for Ollama or <code>APISettingsDialog</code> for an API) based on the currently selected mode. This resolves all ambiguity and makes the feature intuitive to use.</li>
+                            </ol>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Fixed a critical UI bug where the API settings button was permanently invisible.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> A logic error in the toolbar setup (<code>self.api_settings_btn.setVisible(False)</code>) caused the button to configure the API to be hidden, making the entire feature inaccessible.</li>
+                        <li><strong>Solution:</strong> The erroneous line was removed, and the toolbar was refactored to use the new unified "Settings" button, ensuring the correct dialog is always accessible.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed an architectural violation where UI components were defined outside of <code>graphite_ui.py</code>.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The <code>APISettingsDialog</code> was incorrectly defined within the main application file (<code>graphite_app.py</code>), breaking the project's modular structure.</li>
+                        <li><strong>Solution:</strong> The <code>APISettingsDialog</code> class has been moved to its proper location within <code>graphite_ui.py</code>, restoring the architectural integrity and separation of concerns.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.2.1]</code> - 2024-05-25</h3>
+            <p>This release focuses on critical stability and functionality fixes, primarily addressing issues within the API provider integration and the core UI rendering system.</p>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Fixed a critical application crash when loading models from the Google Gemini API.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The application would crash with a <code>TypeError</code> when fetching the model list from Gemini. A deep-dive analysis revealed this was due to a fundamental incompatibility between the installed <code>google-generativeai</code> library and the current data structure of the API's response. The previous design, which relied on dynamic model discovery, proved to be too brittle for this provider.</li>
+                        <li><strong>Solution:</strong> The architecture for the Gemini provider has been completely refactored. The brittle dynamic discovery process has been removed and replaced with a static, hard-coded list of known-stable Gemini models. The API Settings UI now intelligently adapts, hiding non-functional controls (e.g., "Load Models") for the Gemini provider and populating the model list instantly and reliably.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed a critical logic error preventing chat messages from being sent to Gemini models.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> After successfully configuring a Gemini model, all chat attempts would fail with an "Error: message cannot be blank."</li>
+                        <li><strong>Solution:</strong> The root cause was identified in the <code>api_provider.chat()</code> function, where a <code>pop()</code> operation was incorrectly removing the user's current message from the conversation history before the payload was sent to the API. This line has been removed, ensuring the complete and correct conversation context is now sent with every request.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed a fatal application crash on startup due to incorrect UI class definition order.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> A regression from a previous refactor caused the application to crash on launch with an <code>ImportError</code> and underlying <code>NameError</code> exceptions. Classes within <code>graphite_ui.py</code> (e.g., <code>ColorPickerDialog</code>, <code>ConnectionItem</code>) were being referenced before they were defined, halting the module loading process.</li>
+                        <li><strong>Solution:</strong> The class definitions within <code>graphite_ui.py</code> have been meticulously reordered to ensure a correct, top-to-bottom dependency resolution. All classes are now defined before they are instantiated or referenced, resolving the startup crash.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed a fatal UI rendering crash related to the <code>ChartItem</code> class.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The application would enter a crash loop during the UI paint event, raising an <code>AttributeError</code> for a non-existent <code>QPainter.RenderHint</code> (<code>HighQualityAntialiasing</code>).</li>
+                        <li><strong>Solution:</strong> The erroneous line has been removed from the <code>ChartItem.paint()</code> method. Rendering quality is preserved by other existing and correct render hints (<code>SmoothPixmapTransform</code>), and the crash is fully resolved.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="changed">Changed</h4>
+            <ul>
+                <li><strong>Updated the static model list for the Google Gemini provider.</strong>
+                    <ul>
+                        <li>The hard-coded list of Gemini models was updated to include the latest stable releases available through the public API, including the <code>gemini-2.5-pro</code> and <code>gemini-2.5-flash</code> series, ensuring users have access to current and powerful models.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.2.0]</code> - 2024-05-23</h3>
             <h4 class="refactor">Architectural Refactor</h4>
             <ul>
                 <li>This update introduces a major architectural refactoring to improve the project's structure, maintainability, and scalability. The application has been transitioned from a single, monolithic script into a modular, multi-file structure with a clear separation of concerns. The primary goal of this refactor was to decouple the User Interface, Core Logic, and AI Agent services from one another.</li>
