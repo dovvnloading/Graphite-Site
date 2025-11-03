@@ -673,6 +673,39 @@
       background: linear-gradient(135deg, #059669, #0284c7);
     }
 
+    .test-link-section {
+      margin: 40px 0;
+      padding: 24px;
+      border: 2px dashed var(--accent-orange);
+      border-radius: 10px;
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    .test-link-section h3 {
+      color: var(--accent-orange);
+      margin-top: 0;
+    }
+
+    .test-link-section p {
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .test-link-section a {
+      display: inline-block;
+      padding: 10px 16px;
+      background: linear-gradient(135deg, var(--accent-orange), rgba(217, 119, 6, 0.8));
+      color: white;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .test-link-section a:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(245, 158, 11, 0.3);
+    }
+
     /* ====== FOOTER ====== */
     footer {
       border-top: 1px solid var(--line);
@@ -734,6 +767,13 @@
         <a class="btn" href="#features">Explore</a>
       </div>
     </header>
+
+    <!-- TEST LINK SECTION -->
+    <section class="container test-link-section">
+      <h3>🔗 Test Link</h3>
+      <p>Check out the test page to verify this site is working correctly:</p>
+      <a href="https://github.com/dovvnloading/Graphite-Site/blob/main/test.html" target="_blank" rel="noopener">View Test Page on GitHub</a>
+    </section>
 
     <!-- OVERVIEW -->
     <section id="overview" class="container">
@@ -800,379 +840,3 @@
           <h3>Connections & Relationships</h3>
           <ul>
             <li>Conversation flow visualization</li>
-            <li>Custom path routing with pins</li>
-            <li>Bezier curve control points</li>
-            <li>Content links between nodes</li>
-            <li>System prompt connections</li>
-            <li>Orthogonal routing option</li>
-            <li>Color-coded branches</li>
-          </ul>
-          <div class="feature-tooltip">Visualize relationships between nodes with customizable paths and connections that help clarify your reasoning flow.</div>
-        </div>
-        <div class="feature-list-card">
-          <h3>AI & Analysis</h3>
-          <ul>
-            <li>Multi-provider support (5+ services)</li>
-            <li>Run workflows across all models</li>
-            <li>AI chart generation (5 types)</li>
-            <li>Image generation from prompts</li>
-            <li>Generate takeaways and explainers</li>
-            <li>Custom system prompts per branch</li>
-            <li>Role-based AI behavior</li>
-          </ul>
-          <div class="feature-tooltip">Leverage different AI models simultaneously to generate content, analyze data, create visualizations, and explore multiple reasoning paths.</div>
-        </div>
-        <div class="feature-list-card">
-          <h3>File & Content</h3>
-          <ul>
-            <li>Drag-and-drop file attachment</li>
-            <li>Image formats (PNG, JPG, WebP)</li>
-            <li>11+ document formats supported</li>
-            <li>Automatic text extraction</li>
-            <li>Export nodes to PDF, DOCX, MD, and more</li>
-            <li>Multi-modal prompt support</li>
-            <li>Full-text search across canvas</li>
-          </ul>
-          <div class="feature-tooltip">Attach and process files directly in your workspace. Export any content to standard formats, with automatic parsing and searchable content indexing.</div>
-        </div>
-        <div class="feature-list-card">
-          <h3>Session & Knowledge</h3>
-          <ul>
-            <li>Chat library for all sessions</li>
-            <li>Load, delete, rename, search</li>
-            <li>Manual save with Ctrl+S</li>
-            <li>Full state preservation</li>
-            <li>Local SQLite database</li>
-            <li>Auto-generated titles</li>
-            <li>Zero cloud dependency</li>
-          </ul>
-          <div class="feature-tooltip">Save and manage all your work locally with automatic session titling and complete state recovery including zoom levels and scroll positions.</div>
-        </div>
-        <div class="feature-list-card">
-          <h3>Configuration & Models</h3>
-          <ul>
-            <li>Ollama local model execution</li>
-            <li>OpenAI, Anthropic, Gemini, Groq</li>
-            <li>API key management</li>
-            <li>Model-task specific routing</li>
-            <li>OpenAI-compatible endpoints</li>
-            <li>Flexible base URL config</li>
-            <li>Provider switching</li>
-          </ul>
-          <div class="feature-tooltip">Connect to any AI provider with flexible configuration and assign different models for different tasks based on your needs.</div>
-        </div>
-        <div class="feature-list-card">
-          <h3>UI & Experience</h3>
-          <ul>
-            <li>Command palette with Ctrl+K</li>
-            <li>Search overlay with Ctrl+F</li>
-            <li>Context menus for actions</li>
-            <li>Customizable canvas settings</li>
-            <li>Grid and font adjustments</li>
-            <li>Dark theme optimized</li>
-            <li>Complete keyboard shortcuts</li>
-          </ul>
-          <div class="feature-tooltip">Access all features via the Command Palette, search overlay, context menus, and keyboard shortcuts. Customize your workspace with on-canvas controls.</div>
-        </div>
-        <div class="feature-list-card">
-          <h3>Plugins & Extensibility</h3>
-          <ul>
-            <li>Plugin architecture framework</li>
-            <li>System Prompt Plugin</li>
-            <li>Py-Coder Plugin with code execution</li>
-            <li>Data visualization tools</li>
-            <li>Custom integrations</li>
-            <li>Workflow-specific extensions</li>
-            <li>API for developers</li>
-          </ul>
-          <div class="feature-tooltip">Extend Graphite with powerful plugins like the Py-Coder for code execution and the System Prompt editor, plus tools for RAG, visualizations, and custom workflows.</div>
-        </div>
-        <div class="feature-list-card">
-          <h3>Licensing & Privacy</h3>
-          <ul>
-            <li>5-day free trial, no card needed</li>
-            <li>Offline activation</li>
-            <li>Zero telemetry or tracking</li>
-            <li>Fully offline operation mode</li>
-            <li>Complete data ownership</li>
-            <li>Direct developer support</li>
-            <li>Independence and reliability</li>
-          </ul>
-          <div class="feature-tooltip">Activate once and work forever with complete privacy, no tracking, and the ability to work entirely offline on your own device.</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CORE CAPABILITIES (original section) -->
-    <section class="container">
-      <h2>Core Capabilities</h2>
-      <div class="grid-3">
-        <div class="card">
-          <h3>Node-Graph Canvas</h3>
-          <p>Organize reasoning spatially. Branch paths, fork decisions, and maintain clarity about how you arrived at conclusions.</p>
-        </div>
-        <div class="card">
-          <h3>Multi-Provider Routing</h3>
-          <p>Run the same workflow across different models. Test hypotheses, compare outputs, and pick the best approach without context switching.</p>
-        </div>
-        <div class="card">
-          <h3>Session Memory</h3>
-          <p>Projects are durable. Search across past work, reference earlier reasoning, and build knowledge graphs that compound over time.</p>
-        </div>
-        <div class="card">
-          <h3>Local Models First</h3>
-          <p>Ollama integration gives you privacy-first inference. No API keys. No limits. No data leaving your machine.</p>
-        </div>
-        <div class="card">
-          <h3>Plugin Ecosystem</h3>
-          <p>Extend functionality with RAG, code execution, visualization tools, and integrations tailored to your specific workflow.</p>
-        </div>
-        <div class="card">
-          <h3>Transparent Workflows</h3>
-          <p>Every step is visible. Understand exactly how conclusions were reached. Perfect for research, documentation, and team review.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- MODELS -->
-    <section id="models" class="container">
-      <h2>Supported Models & Providers</h2>
-      <p class="lead" style="max-width: 100%; margin-bottom: 32px;">
-        Run locally with Ollama or connect to frontier models via API. Everything routes through Graphite's unified node-graph interface.
-      </p>
-      <div class="grid-3">
-        <div class="card">
-          <h3>Ollama</h3>
-          <p>Run models locally. Fully offline, privacy-first. No API keys. Complete control and zero data transit.</p>
-        </div>
-        <div class="card">
-          <h3>OpenAI</h3>
-          <p>GPT-class models via API. Advanced reasoning and multi-modal capabilities for frontier inference.</p>
-        </div>
-        <div class="card">
-          <h3>Anthropic</h3>
-          <p>Claude models optimized for extended thinking, analysis, and nuanced reasoning tasks.</p>
-        </div>
-        <div class="card">
-          <h3>Google Gemini</h3>
-          <p>Multimodal capabilities including vision, text, and advanced understanding. Direct API integration.</p>
-        </div>
-        <div class="card">
-          <h3>Groq</h3>
-          <p>High-speed inference for real-time, interactive workflows. Low-latency reasoning and response generation.</p>
-        </div>
-        <div class="card">
-          <h3>OpenAI-Compatible</h3>
-          <p>OpenRouter, Together, self-hosted models, and any endpoint that supports the OpenAI protocol.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- PRICING -->
-    <section id="pricing" class="container">
-      <h2>Licensing & Pricing</h2>
-      <p class="lead" style="max-width: 100%; margin-bottom: 48px;">
-        Free 5-day trial with full features. Pro subscriptions sustain development, plugins, support, and the independence of this project.
-      </p>
-
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; margin-bottom: 60px;">
-        
-        <!-- Free Trial Card -->
-        <div class="pricing-card">
-          <div class="pricing-header">
-            <h3 style="margin: 0 0 12px; color: var(--text);">Free Trial</h3>
-            <div class="pricing-price">5 days</div>
-            <div class="pricing-period">Full features, no credit card</div>
-          </div>
-          <div class="pricing-details">
-            <details class="pricing-details" open>
-              <summary>What's included</summary>
-              <div class="pricing-details-content">
-                <ul>
-                  <li>Complete node-graph canvas with infinite branching</li>
-                  <li>Local models via Ollama (fully private)</li>
-                  <li>One external API provider (OpenAI, Anthropic, etc.)</li>
-                  <li>Frames, notes, and navigation pins</li>
-                  <li>Temporary session storage (not saved)</li>
-                  <li>Full access to all core features</li>
-                </ul>
-              </div>
-            </details>
-          </div>
-          <a href="#download" class="cta-button">Start Free Trial</a>
-        </div>
-
-        <!-- Pro Monthly Card -->
-        <div class="pricing-card">
-          <div class="pricing-header">
-            <h3 style="margin: 0 0 12px; color: var(--node-response);">Pro Monthly</h3>
-            <div class="pricing-price" style="color: var(--node-response);">$8</div>
-            <div class="pricing-period">Billed monthly, cancel anytime</div>
-          </div>
-          <div class="pricing-details">
-            <details class="pricing-details" open>
-              <summary>Everything in Free, plus:</summary>
-              <div class="pricing-details-content">
-                <ul>
-                  <li>Unlimited access—no expiration</li>
-                  <li>All API providers supported simultaneously</li>
-                  <li>Persistent project storage and search</li>
-                  <li>Full plugin ecosystem access</li>
-                  <li>Priority bug fixes and updates</li>
-                  <li>Direct developer support via email</li>
-                  <li>Early access to new features</li>
-                </ul>
-              </div>
-            </details>
-          </div>
-          <a href="#download" class="cta-button primary">Upgrade to Pro</a>
-        </div>
-
-        <!-- Pro Annual Card -->
-        <div class="pricing-card">
-          <div class="pricing-header">
-            <h3 style="margin: 0 0 12px; color: var(--node-query);">Pro Annual</h3>
-            <div class="pricing-price" style="color: var(--node-query);">$65</div>
-            <div class="pricing-period">$5.42/month, save 2 months</div>
-          </div>
-          <div class="pricing-details">
-            <details class="pricing-details" open>
-              <summary>All Pro Monthly benefits</summary>
-              <div class="pricing-details-content">
-                <p>Same unlimited access and support as monthly, with a discounted annual rate. Renews automatically—cancel anytime before renewal.</p>
-              </div>
-            </details>
-          </div>
-          <a href="#download" class="cta-button primary">Choose Annual</a>
-        </div>
-
-        <!-- Founders License Card -->
-        <div class="pricing-card founder" style="border-color: var(--accent-orange); border-width: 2px;">
-          <div class="pricing-header" style="background: rgba(245, 158, 11, 0.08);">
-            <h3 style="margin: 0 0 12px; color: var(--accent-orange);">Founders License</h3>
-            <div class="pricing-price" style="color: var(--accent-orange);">$99</div>
-            <div class="pricing-period">One-time payment, lifetime updates</div>
-            <span class="pricing-badge community">Limited availability</span>
-          </div>
-          <div class="pricing-details">
-            <details class="pricing-details" open>
-              <summary>All Pro features, plus exclusive perks</summary>
-              <div class="pricing-details-content">
-                <ul>
-                  <li>Lifetime updates and access—never expires</li>
-                  <li>Exclusive "Founder" community badge in roadmap discussions</li>
-                  <li>Priority consideration for feature requests</li>
-                  <li>Direct line to developer for insights and strategic input</li>
-                  <li>Earliest access to beta features before public release</li>
-                  <li>Recognition in project credits and GitHub contributors</li>
-                  <li>Special pricing on future Graphite products</li>
-                </ul>
-                <p style="margin-top: 16px; color: var(--accent-orange); font-weight: 600;">Only 50 licenses available.</p>
-              </div>
-            </details>
-          </div>
-          <a href="#download" class="cta-button" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.2)); border-color: var(--accent-orange); color: var(--accent-orange);">Claim Founders License</a>
-        </div>
-
-      </div>
-
-      <!-- Comparison Table -->
-      <div style="margin-top: 60px;">
-        <h3 style="margin-bottom: 20px; text-align: center;">Feature Comparison</h3>
-        <table class="pricing-table">
-          <thead>
-            <tr>
-              <th>Feature</th>
-              <th>Free Trial</th>
-              <th>Pro</th>
-              <th>Founders</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Duration</td>
-              <td>5 days</td>
-              <td>Unlimited</td>
-              <td>Lifetime</td>
-            </tr>
-            <tr>
-              <td>Local Models (Ollama)</td>
-              <td>Yes</td>
-              <td>Yes</td>
-              <td>Yes</td>
-            </tr>
-            <tr>
-              <td>External API Providers</td>
-              <td>1 provider</td>
-              <td>All supported</td>
-              <td>All supported</td>
-            </tr>
-            <tr>
-              <td>Persistent Projects</td>
-              <td>—</td>
-              <td>Yes</td>
-              <td>Yes</td>
-            </tr>
-            <tr>
-              <td>Plugin Ecosystem</td>
-              <td>—</td>
-              <td>Full access</td>
-              <td>Full access</td>
-            </tr>
-            <tr>
-              <td>Developer Support</td>
-              <td>Community</td>
-              <td>Email support</td>
-              <td>Direct + strategic input</td>
-            </tr>
-            <tr>
-              <td>Community Badge</td>
-              <td>—</td>
-              <td>—</td>
-              <td>Exclusive badge</td>
-            </tr>
-            <tr>
-              <td>Beta Access</td>
-              <td>—</td>
-              <td>Early access</td>
-              <td>Earliest access</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <!-- DOWNLOAD -->
-    <section id="download" class="container">
-      <h2>Get Started</h2>
-      <div class="grid-3" style="margin-top: 32px;">
-        <div class="card">
-          <h3>Windows</h3>
-          <p>64-bit • Windows 10/11</p>
-          <a class="btn btn-primary" href="#" style="margin-top: 14px; display: block; text-align: center;">Download .exe</a>
-        </div>
-        <div class="card">
-          <h3>macOS</h3>
-          <p>Universal build • Coming soon</p>
-          <button class="btn" style="margin-top: 14px; opacity: 0.6; cursor: not-allowed;" disabled>Coming Soon</button>
-        </div>
-        <div class="card">
-          <h3>Linux</h3>
-          <p>Build from source • AppImage coming soon</p>
-          <a class="btn" href="#" style="margin-top: 14px; display: block; text-align: center;">View on GitHub</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- FOOTER -->
-    <footer>
-      <div>© 2025 Graphite. All rights reserved.</div>
-      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-        <a class="btn" href="https://github.com/dovvnloading/Graphite" target="_blank" rel="noopener">GitHub</a>
-        <a class="btn" href="https://github.com/dovvnloading/Graphite-Site/blob/main/Documentation.md" target="_blank" rel="noopener">Docs</a>
-        <a class="btn" href="mailto:dev.graphite@gmail.com">Contact</a>
-      </div>
-    </footer>
-  </main>
-</body>
-</html>
