@@ -51,10 +51,18 @@
     .pan-content {
         width: 100%;
         height: 100%;
-        background-size: 180%;
+        background-size: 150%;
         background-position: center;
         background-repeat: no-repeat;
         filter: brightness(0.5);
+        opacity: 0;
+        transition: 
+            opacity 1s ease-in-out,
+            background-position 12s cubic-bezier(0.45, 0, 0.55, 1);
+    }
+
+    .pan-content.visible {
+        opacity: 1;
     }
 
     .overlay {
@@ -578,7 +586,7 @@
           height: 350px;
       }
       .pan-content {
-          background-size: 220%;
+          background-size: 180%;
       }
     }
 
@@ -587,7 +595,7 @@
             height: 280px;
         }
         .pan-content {
-            background-size: 250%;
+            background-size: 200%;
         }
         .image-indicator {
             bottom: 16px;
@@ -904,7 +912,60 @@
     let currentImageIndex = 0;
     const panContent = document.getElementById('panContent');
     const imageIndicator = document.getElementById('imageIndicator');
+    let imageCycleInterval;
 
+    const PAN_DURATION = 12000;
+    const FADE_DURATION = 1000;
+    const TOTAL_CYCLE = PAN_DURATION + FADE_DURATION;
+
+    function getRandomPosition() {
+        const x = 40 + Math.random() * 20;
+        const y = 40 + Math.random() * 20;
+        return `${x}% ${y}%`;
+    }
+
+    function showImage(index) {
+        panContent.classList.remove('visible');
+
+        setTimeout(() => {
+            currentImageIndex = index;
+            panContent.style.backgroundImage = `url('${images[index]}')`;
+            panContent.style.backgroundPosition = getRandomPosition();
+
+            document.querySelectorAll('.dot').forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+
+            panContent.classList.add('visible');
+
+            setTimeout(() => {
+                panContent.style.backgroundPosition = getRandomPosition();
+            }, 100);
+
+        }, FADE_DURATION);
+    }
+
+    function startCycle() {
+        imageCycleInterval = setInterval(() => {
+            const nextIndex = (currentImageIndex + 1) % images.length;
+            showImage(nextIndex);
+        }, TOTAL_CYCLE);
+    }
+
+    function goToImage(index) {
+        if (index === currentImageIndex) return;
+        clearInterval(imageCycleInterval);
+        showImage(index);
+        startCycle();
+    }
+
+    // Preload images
+    images.forEach(src => {
+        const img = new Image();
+        img.src = src;
+    });
+
+    // Create indicator dots
     images.forEach((_, index) => {
         const dot = document.createElement('div');
         dot.className = `dot ${index === 0 ? 'active' : ''}`;
@@ -912,82 +973,9 @@
         imageIndicator.appendChild(dot);
     });
 
-    function getRandomFocusPoint() {
-        return {
-            x: Math.random() * 40 + 30,
-            y: Math.random() * 40 + 30
-        };
-    }
-
-    function panToFocusPoint(focusPoint) {
-        const duration = 5000;
-        const easeInOutCubic = (t) => {
-            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
-        };
-
-        const startX = parseInt(panContent.style.backgroundPositionX) || 50;
-        const startY = parseInt(panContent.style.backgroundPositionY) || 50;
-        const targetX = focusPoint.x;
-        const targetY = focusPoint.y;
-
-        const startTime = Date.now();
-
-        const animate = () => {
-            const elapsed = Date.now() - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const eased = easeInOutCubic(progress);
-
-            const currentX = startX + (targetX - startX) * eased;
-            const currentY = startY + (targetY - startY) * eased;
-
-            panContent.style.backgroundPosition = `${currentX}% ${currentY}%`;
-
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            } else if (progress === 1) {
-                setTimeout(() => {
-                    panToFocusPoint(getRandomFocusPoint());
-                }, 1000);
-            }
-        };
-
-        requestAnimationFrame(animate);
-    }
-
-    function loadImage(index) {
-        currentImageIndex = index;
-        panContent.style.backgroundImage = `url('${images[index]}')`;
-        panContent.style.backgroundPosition = '50% 50%';
-
-        document.querySelectorAll('.dot').forEach((dot, i) => {
-            dot.classList.toggle('active', i === index);
-        });
-
-        setTimeout(() => {
-            panToFocusPoint(getRandomFocusPoint());
-        }, 500);
-    }
-
-    function goToImage(index) {
-        loadImage(index);
-    }
-
-    images.forEach(src => {
-        const img = new Image();
-        img.src = src;
-    });
-
-    function scheduleRandomImageChange() {
-        const randomDelay = Math.random() * 8000 + 12000; // 12-20 seconds
-        setTimeout(() => {
-            currentImageIndex = Math.floor(Math.random() * images.length);
-            loadImage(currentImageIndex);
-            scheduleRandomImageChange();
-        }, randomDelay);
-    }
-
-    loadImage(0);
-    scheduleRandomImageChange();
+    // Initial load
+    showImage(0);
+    startCycle();
   </script>
 </body>
 </html>
