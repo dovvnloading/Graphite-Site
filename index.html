@@ -909,6 +909,17 @@
         'https://github.com/dovvnloading/Graphite-Site/blob/main/Screenshot%202025-11-05%20100316.png?raw=true'
     ];
 
+    const panPaths = [
+        { start: '0% 0%', end: '100% 100%' },
+        { start: '100% 0%', end: '0% 100%' },
+        { start: '0% 100%', end: '100% 0%' },
+        { start: '100% 100%', end: '0% 0%' },
+        { start: '20% 0%', end: '80% 100%' },
+        { start: '0% 80%', end: '100% 20%' },
+        { start: '80% 0%', end: '20% 100%' },
+        { start: '100% 80%', end: '0% 20%' }
+    ];
+
     let currentImageIndex = 0;
     const panContent = document.getElementById('panContent');
     const imageIndicator = document.getElementById('imageIndicator');
@@ -918,31 +929,26 @@
     const FADE_DURATION = 1000;
     const TOTAL_CYCLE = PAN_DURATION + FADE_DURATION;
 
-    function getRandomPosition() {
-        const margin = 10;
-        const range = 100 - margin * 2;
-        const x = margin + Math.random() * range;
-        const y = margin + Math.random() * range;
-        return `${x.toFixed(2)}% ${y.toFixed(2)}%`;
-    }
-
     function showImage(index) {
         panContent.classList.remove('visible');
 
         setTimeout(() => {
             currentImageIndex = index;
+            const path = panPaths[Math.floor(Math.random() * panPaths.length)];
+
+            panContent.style.transition = 'none';
             panContent.style.backgroundImage = `url('${images[index]}')`;
-            panContent.style.backgroundPosition = getRandomPosition();
+            panContent.style.backgroundPosition = path.start;
 
             document.querySelectorAll('.dot').forEach((dot, i) => {
                 dot.classList.toggle('active', i === index);
             });
+            
+            panContent.offsetHeight;
 
+            panContent.style.transition = `opacity ${FADE_DURATION}ms ease-in-out, background-position ${PAN_DURATION}ms cubic-bezier(0.45, 0, 0.55, 1)`;
             panContent.classList.add('visible');
-
-            setTimeout(() => {
-                panContent.style.backgroundPosition = getRandomPosition();
-            }, 100);
+            panContent.style.backgroundPosition = path.end;
 
         }, FADE_DURATION);
     }
