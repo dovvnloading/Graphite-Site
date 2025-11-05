@@ -1,6 +1,3 @@
-
-
-<html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>Changelog — Graphite Pro</title>
@@ -289,15 +286,15 @@
   <main>
     <nav class="nav" aria-label="Primary">
       <div class="container nav-row">
-        <a class="brand" href="Site_Ref.html">
+        <a class="brand" href="index.html">
           <img src="https://raw.githubusercontent.com/dovvnloading/Graphite-Site/main/graphite.png" alt="Graphite" style="width: 32px; height: 32px; border-radius: 6px;">
           <span>Graphite</span>
         </a>
         <div class="nav-links">
-          <a href="Site_Ref.html#features">Features</a>
-          <a href="Site_Ref.html#pricing">Pricing</a>
+          <a href="index.html#features">Features</a>
+          <a href="index.html#pricing">Pricing</a>
           <a href="Changelog.html" class="active">Dev Log</a>
-          <a class="btn btn-primary" href="Site_Ref.html#download">Download</a>
+          <a class="btn btn-primary" href="index.html#download">Download</a>
         </div>
       </div>
     </nav>
@@ -311,7 +308,162 @@
 
     <section id="changelog">
       <div class="timeline">
-      
+
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.6.9]</code></h3>
+            <p class="date">2025-11-04</p>
+            <p>This is a major feature release that introduces the <strong>Conversation Node</strong>, a powerful new tool for managing complex, linear discussions within the graph. This feature allows users to encapsulate detailed sub-tasks into a single, interactive node, which can both inherit and provide rich context to the main canvas.</p>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Introduced the Conversation Node Plugin.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> A new "Conversation Node" can be created from the "Plugins" menu. It provides a self-contained, vertically scrolling chat interface (similar to standard chatbots) directly on the canvas.</li>
+                        <li><strong>Context Inheritance:</strong> When created, the node automatically makes a one-time copy of its parent's entire conversation history and displays it visually. This "snapshots" the context, allowing the new conversation to start with a full understanding of the preceding discussion.</li>
+                        <li><strong>Focused Interaction:</strong> Users can engage in a detailed, multi-step conversation with the AI entirely within the node's UI, preventing clutter on the main graph.</li>
+                        <li><strong>Context Provision:</strong> The entire internal chat log of the Conversation Node (inherited history + new messages) can be used as a rich source of context for any new nodes that branch off from it.</li>
+                    </ul>
+                </li>
+                <li><strong>Architectural Integration for the New Node Type.</strong>
+                    <ul>
+                        <li><strong>Dedicated UI:</strong> The node's internal UI was built using a custom <code>QGraphicsScene</code> and <code>QGraphicsView</code>, where each message is a distinct <code>ChatMessageBubbleItem</code>. This ensures full integration with application features.</li>
+                        <li><strong>Search and Highlighting:</strong> The application's search functionality (<code>Ctrl+F</code>) now works seamlessly inside Conversation Nodes, correctly highlighting the specific message bubble that contains the search term.</li>
+                        <li><strong>Full Persistence:</strong> The <code>ChatSessionManager</code> has been updated to serialize and deserialize Conversation Nodes, including their entire internal chat history and connections, ensuring that sessions are saved and loaded perfectly.</li>
+                        <li><strong>Plugin Interoperability:</strong> All other plugin nodes (like <code>Py-Coder</code> and <code>WebNode</code>) can now be correctly branched from a Conversation Node, allowing for complex, chained workflows.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Made the <code>graphite-Web</code> Plugin Context-Aware.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The <code>graphite-Web</code> node was not using the conversation history. This meant that contextual queries (e.g., "what is its price?") would fail because the search agent lacked the necessary context to understand what "it" referred to.</li>
+                        <li><strong>Solution:</strong> The web search workflow has been rebuilt. The agent now uses an LLM to analyze the conversation history and transform the user's input into a self-contained, effective search query. The summarization step also receives the full conversation history, allowing it to generate a final answer that is relevant to the ongoing discussion.</li>
+                        <li><strong>Result:</strong> The <code>graphite-Web</code> plugin now correctly handles contextual follow-up questions, making it a much more powerful and intuitive tool for research.</li>
+                    </ul>
+                </li>
+                <li><strong>Refined Chat UI for Conversation Node.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The initial design of the internal chat UI used visually jarring colors (bright green and blue) that did not fit the node's aesthetic.</li>
+                        <li><strong>Solution:</strong> The chat bubbles were redesigned with a professional, neutral color scheme (dark grays) to create a more focused and visually pleasing user experience.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.6.8]</code></h3>
+            <p class="date">2025-11-04</p>
+            <p>This is a major stability and user experience release that resolves critical threading crashes, fixes widespread UI inconsistencies, and introduces a new long-hover interaction to visualize conversation flow.</p>
+            <h4 class="refactor">Architectural Refactor</h4>
+            <ul>
+                <li><strong>Corrected Application Threading Model to Eliminate Crashes.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The application was unstable and would frequently crash with <code>QThread: Destroyed while thread is still running</code> and <code>QObject::killTimer: Timers cannot be stopped from another thread</code>. This was caused by a fundamental architectural flaw where worker thread objects were being prematurely garbage-collected or improperly managed from the main GUI thread.</li>
+                        <li><strong>Solution:</strong> The threading architecture was completely rebuilt to adhere to Qt's strict threading and memory management rules.
+                            <ol>
+                                <li><strong>Correct Object Ownership:</strong> Worker threads are now stored as member variables of the <code>ChatWindow</code>, creating a persistent reference that prevents them from being destroyed while running.</li>
+                                <li><strong>Safe Self-Destruction:</strong> All worker threads now use the <code>deleteLater()</code> slot connected to their <code>finished</code> and <code>error</code> signals. This is the standard Qt "fire-and-forget" pattern, ensuring threads schedule their own safe cleanup from the main event loop.</li>
+                                <li><strong>Removal of Unsafe Code:</strong> All manual thread cleanup methods (<code>cleanup_..._thread</code>) and the dangerous <code>stop_all_workers</code> procedure were removed entirely, as they were the root cause of the crashes.</li>
+                            </ol>
+                        </li>
+                        <li><strong>Result:</strong> The application is now architecturally sound and stable, with all critical threading crashes resolved.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Implemented Ancestor Connection Animation on Long Hover.</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> A new <code>HoverAnimationMixin</code> class was created to provide shared functionality to all node types. When a user hovers their mouse over any node for a brief period (750ms), the connection lines for all of its ancestors are animated with flowing arrows, tracing the conversational path back to the root.</li>
+                        <li><strong>Benefit:</strong> This provides intuitive, real-time visual feedback, making it easy to understand the history and context of any node within a complex graph. The animation stops immediately when the hover ends.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Resolved Keyboard Shortcut Interference with Text Input.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The keyboard shortcuts for canvas navigation (<code>W</code>, <code>A</code>, <code>S</code>, <code>D</code>, <code>Q</code>, <code>E</code>) were incorrectly intercepting key presses when the user was trying to type inside a <code>Note</code>, <code>Frame</code> title, <code>PyCoderNode</code>, or <code>WebNode</code>.</li>
+                        <li><strong>Solution:</strong> The <code>keyPressEvent</code> handler in <code>ChatView</code> was updated to be context-aware. It now checks if the currently focused item is a text input field or in a custom editing mode. If so, the navigation shortcuts are bypassed, allowing for normal text input.</li>
+                    </ul>
+                </li>
+                <li><strong>Restored Hover Highlight Effect on All Nodes.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> An architectural mistake in the implementation of the <code>HoverAnimationMixin</code> caused it to incorrectly override the <code>hoverEnterEvent</code> and <code>hoverLeaveEvent</code> methods of all nodes, breaking the standard visual hover highlight effect.</li>
+                        <li><strong>Solution:</strong> The mixin was refactored to provide helper methods (<code>_handle_hover_enter</code>, <code>_handle_hover_leave</code>) instead of overriding the events directly. Each node class now correctly calls both its superclass's event handler and the mixin's helper, restoring the hover highlight while enabling the new animation feature.</li>
+                    </ul>
+                </li>
+                <li><strong>Corrected Lost Connections for Plugin Nodes.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> Connections branching off from <code>PyCoderNode</code> and <code>WebNode</code> were not being saved, causing them to disappear when a chat session was reloaded.</li>
+                        <li><strong>Solution:</strong>
+                            <ol>
+                                <li>The serialization logic was fixed to save the <code>children_indices</code> for <code>PyCoderNode</code> and <code>WebNode</code>, ensuring these relationships are persisted.</li>
+                                <li>The plugin creation logic was updated to correctly establish the bidirectional parent-child link in the live object graph when these nodes are created.</li>
+                            </ol>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="changelog-entry">
+            <h3><code>[Beta v.0.6.7]</code></h3>
+            <p class="date">2025-11-03</p>
+            <p>This release introduces the <strong>Web Search Plugin</strong>, a major new feature that integrates real-time web information directly into the Graphite canvas. It allows users to perform web-grounded queries with a built-in safety and relevance validation process.</p>
+            <h4 class="added">Added</h4>
+            <ul>
+                <li><strong>Introduced the Web Search Plugin (<code>graphite-Web</code>).</strong>
+                    <ul>
+                        <li><strong>Feature:</strong> A new "graphite-Web" node can be created from the "Plugins" menu or the Command Palette (<code>Ctrl+K</code>). This node provides a dedicated interface to run web queries.</li>
+                        <li><strong>Workflow:</strong> The node orchestrates a multi-step process in the background:
+                            <ol>
+                                <li>Performs a web search based on the user's query.</li>
+                                <li>Fetches content from the top search results.</li>
+                                <li><strong>Validates</strong> each piece of content for safety and relevance using a dedicated AI call.</li>
+                                <li><strong>Summarizes</strong> the validated content to provide a concise, direct answer to the original query.</li>
+                            </ol>
+                        </li>
+                        <li><strong>UI:</strong> The <code>WebNode</code> has a distinct orange theme and provides real-time status updates as it progresses through the search, fetch, validate, and summarize stages. Final results include a formatted summary and clickable source links.</li>
+                    </ul>
+                </li>
+                <li><strong>Expanded System Architecture for Web Functionality.</strong>
+                    <ul>
+                        <li><strong>New Agents:</strong> Implemented a <code>WebSearchAgent</code> and <code>WebWorkerThread</code> to handle the complex, multi-step retrieval and validation logic without freezing the UI.</li>
+                        <li><strong>Serialization:</strong> The <code>ChatSessionManager</code> has been updated to fully support saving and loading the new <code>WebNode</code> and its connections, ensuring complete data persistence.</li>
+                        <li><strong>Plugin Integration:</strong> The <code>PluginPortal</code> and <code>ChatScene</code> were extended to manage the lifecycle of the new web components.</li>
+                    </ul>
+                </li>
+            </ul>
+            <h4 class="fixed">Fixed</h4>
+            <ul>
+                <li><strong>Resolved Critical Signal/Slot Initialization Error.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The application would crash when creating a <code>WebNode</code> due to an <code>AttributeError</code>, as the node's signals were not correctly registered.</li>
+                        <li><strong>Solution:</strong> The base class for <code>WebNode</code> was corrected from <code>QGraphicsItem</code> to <code>QGraphicsObject</code>, which is required for using Qt's signal and slot mechanism in graphics items. This resolved the instability and made the plugin functional.</li>
+                    </ul>
+                </li>
+                <li><strong>Corrected API Routing for Web Validation.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> The web validation step was incorrectly hard-coded to use a specific API, ignoring the user's selection of "Ollama (Local)" mode and causing errors if an API key was not configured.</li>
+                        <li><strong>Solution:</strong> The API provider logic was refactored to strictly adhere to the globally selected mode (<code>Ollama</code> vs. <code>API</code>). The validation task now correctly routes to the user's chosen provider, restoring logical consistency.</li>
+                    </ul>
+                </li>
+                <li><strong>Updated Deprecated Dependency.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> A <code>RuntimeWarning</code> was being issued because the <code>duckduckgo-search</code> library had been renamed.</li>
+                        <li><strong>Solution:</strong> The import statement was updated to use the new package name, <code>ddgs</code>, ensuring future compatibility and silencing the warning.</li>
+                    </ul>
+                </li>
+                <li><strong>Fixed Painter State Error in Web Connection Animation.</strong>
+                    <ul>
+                        <li><strong>Problem:</strong> A <code>QPainter</code> warning (<code>Painter ended with 1 saved states</code>) was triggered when hovering over a <code>WebNode</code> connection. This was caused by an argument type mismatch in the animation drawing method, leading to an unbalanced painter state.</li>
+                        <li><strong>Solution:</strong> Implemented a local <code>drawArrow</code> method in <code>WebConnectionItem</code> to correctly handle its specific drawing logic, ensuring the painter's state is properly saved and restored. This eliminates the warning and potential rendering artifacts.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        
         <div class="changelog-entry">
           <h3><code>[Beta v.0.6.6]</code></h3>
           <p class="date">2025-11-03</p>
@@ -1594,4 +1746,4 @@
     </footer>
   </main>
 </body>
-</html>
+
