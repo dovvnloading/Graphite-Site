@@ -20,7 +20,7 @@
       --accent-orange: #f59e0b;
     }
 
-    * { box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { margin: 0; padding: 0; }
 
     body {
@@ -31,6 +31,70 @@
     }
 
     a { color: inherit; text-decoration: none; }
+
+    .panning-banner {
+        position: relative;
+        width: 100%;
+        height: 500px;
+        overflow: hidden;
+        background: #000;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .pan-wrapper {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .pan-content {
+        width: 100%;
+        height: 100%;
+        background-size: 180%;
+        background-position: center;
+        background-repeat: no-repeat;
+        filter: brightness(0.5);
+    }
+
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.5) 100%);
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .image-indicator {
+        position: absolute;
+        bottom: 24px;
+        right: 24px;
+        z-index: 3;
+        display: flex;
+        gap: 8px;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .dot:hover {
+        background: rgba(255, 255, 255, 0.6);
+    }
+
+    .dot.active {
+        background: var(--node-response);
+        width: 24px;
+        border-radius: 4px;
+    }
 
     @keyframes float-slow {
       0%, 100% { transform: translateY(0px) translateX(0px); }
@@ -510,6 +574,25 @@
       .pricing-grid {
         grid-template-columns: 1fr;
       }
+      .panning-banner {
+          height: 350px;
+      }
+      .pan-content {
+          background-size: 220%;
+      }
+    }
+
+    @media (max-width: 480px) {
+        .panning-banner {
+            height: 280px;
+        }
+        .pan-content {
+            background-size: 250%;
+        }
+        .image-indicator {
+            bottom: 16px;
+            right: 16px;
+        }
     }
   </style>
 </head>
@@ -518,6 +601,14 @@
   <div class="bg-orb orb-1"></div>
   <div class="bg-orb orb-2"></div>
   <div class="bg-orb orb-3"></div>
+
+  <div class="panning-banner">
+    <div class="pan-wrapper">
+        <div class="pan-content" id="panContent"></div>
+    </div>
+    <div class="overlay"></div>
+    <div class="image-indicator" id="imageIndicator"></div>
+  </div>
 
   <main>
     <nav class="nav" aria-label="Primary">
@@ -801,6 +892,102 @@
       document.getElementById('pricing-overlay').classList.add('hidden');
       document.getElementById('pricing-content').classList.remove('blurred');
     });
+  </script>
+  <script>
+    const images = [
+        'https://github.com/dovvnloading/Graphite-Site/blob/main/Screenshot%202025-11-01%20164719.png?raw=true',
+        'https://github.com/dovvnloading/Graphite-Site/blob/main/Screenshot%202025-11-04%20100904.png?raw=true',
+        'https://github.com/dovvnloading/Graphite-Site/blob/main/Screenshot%202025-11-04%20195232.png?raw=true',
+        'https://github.com/dovvnloading/Graphite-Site/blob/main/Screenshot%202025-11-05%20100316.png?raw=true'
+    ];
+
+    let currentImageIndex = 0;
+    const panContent = document.getElementById('panContent');
+    const imageIndicator = document.getElementById('imageIndicator');
+
+    images.forEach((_, index) => {
+        const dot = document.createElement('div');
+        dot.className = `dot ${index === 0 ? 'active' : ''}`;
+        dot.onclick = () => goToImage(index);
+        imageIndicator.appendChild(dot);
+    });
+
+    function getRandomFocusPoint() {
+        return {
+            x: Math.random() * 40 + 30,
+            y: Math.random() * 40 + 30
+        };
+    }
+
+    function panToFocusPoint(focusPoint) {
+        const duration = 5000;
+        const easeInOutCubic = (t) => {
+            return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        };
+
+        const startX = parseInt(panContent.style.backgroundPositionX) || 50;
+        const startY = parseInt(panContent.style.backgroundPositionY) || 50;
+        const targetX = focusPoint.x;
+        const targetY = focusPoint.y;
+
+        const startTime = Date.now();
+
+        const animate = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = easeInOutCubic(progress);
+
+            const currentX = startX + (targetX - startX) * eased;
+            const currentY = startY + (targetY - startY) * eased;
+
+            panContent.style.backgroundPosition = `${currentX}% ${currentY}%`;
+
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else if (progress === 1) {
+                setTimeout(() => {
+                    panToFocusPoint(getRandomFocusPoint());
+                }, 1000);
+            }
+        };
+
+        requestAnimationFrame(animate);
+    }
+
+    function loadImage(index) {
+        currentImageIndex = index;
+        panContent.style.backgroundImage = `url('${images[index]}')`;
+        panContent.style.backgroundPosition = '50% 50%';
+
+        document.querySelectorAll('.dot').forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+        });
+
+        setTimeout(() => {
+            panToFocusPoint(getRandomFocusPoint());
+        }, 500);
+    }
+
+    function goToImage(index) {
+        loadImage(index);
+    }
+
+    images.forEach(src => {
+        const img = new Image();
+        img.src = src;
+    });
+
+    function scheduleRandomImageChange() {
+        const randomDelay = Math.random() * 8000 + 12000; // 12-20 seconds
+        setTimeout(() => {
+            currentImageIndex = Math.floor(Math.random() * images.length);
+            loadImage(currentImageIndex);
+            scheduleRandomImageChange();
+        }, randomDelay);
+    }
+
+    loadImage(0);
+    scheduleRandomImageChange();
   </script>
 </body>
 </html>
