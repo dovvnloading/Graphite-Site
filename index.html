@@ -445,6 +445,61 @@
       flex-wrap: wrap;
       gap: 24px;
     }
+    
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+      margin-bottom: 60px;
+    }
+
+    .pricing-container {
+      position: relative;
+    }
+
+    .pricing-content {
+      transition: filter 0.4s ease-in-out;
+    }
+
+    .pricing-content.blurred {
+      filter: blur(8px);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .pricing-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 1;
+      transition: opacity 0.4s ease-in-out;
+    }
+
+    .pricing-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .overlay-content {
+      padding: 32px;
+      text-align: center;
+      background: rgba(36, 36, 36, 0.7);
+      backdrop-filter: blur(4px);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      max-width: 450px;
+    }
+
+    .overlay-content h3 {
+      color: var(--text);
+    }
+
+    .overlay-content p {
+      margin: 12px 0 24px;
+    }
 
     @media (max-width: 768px) {
       .nav-links { display: none; }
@@ -452,6 +507,9 @@
       section { margin: 60px 0; }
       footer { flex-direction: column; }
       h1 { font-size: 2.2rem; }
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -491,7 +549,7 @@
       </div>
     </header>
 
-    <section id="overview" class="container">
+    <section id="features" class="container">
       <h2>Why Graphite?</h2>
       <div class="features-grid">
         <div class="feature-card">
@@ -588,7 +646,7 @@
       <h2>Complete Feature List</h2>
       <p class="lead" style="max-width: 100%; margin-bottom: 32px;">Explore all 10 categories of features that make Graphite Pro powerful.</p>
       <div style="text-align: center;">
-        <a class="btn btn-primary" href="Features.html">See All Features →</a>
+        <a class="btn btn-primary" href="features.html">See All Features →</a>
       </div>
     </section>
 
@@ -598,101 +656,111 @@
         Free 5-day trial with full features. Pro subscriptions sustain development, plugins, support, and the independence of this project.
       </p>
 
-      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; margin-bottom: 60px;">
-        
-        <div class="pricing-card">
-          <div class="pricing-header">
-            <h3 style="margin: 0 0 12px; color: var(--text);">Free Trial</h3>
-            <div class="pricing-price">5 days</div>
-            <div class="pricing-period">Full features, no credit card</div>
+      <div class="pricing-container">
+        <div class="pricing-overlay" id="pricing-overlay">
+          <div class="overlay-content">
+            <h3>Pricing Under Review</h3>
+            <p>Our licensing model is currently being finalized. The pricing shown is indicative and subject to change.</p>
+            <button class="btn" id="reveal-pricing-btn">View Preliminary Pricing</button>
           </div>
-          <div class="pricing-details">
-            <details class="pricing-details" open>
-              <summary>What's included</summary>
-              <div class="pricing-details-content">
-                <ul>
-                  <li>Complete node-graph canvas with infinite branching</li>
-                  <li>Local models via Ollama (fully private)</li>
-                  <li>One external API provider (OpenAI, Anthropic, etc.)</li>
-                  <li>Frames, notes, and navigation pins</li>
-                  <li>Temporary session storage (not saved)</li>
-                  <li>Full access to all core features</li>
-                </ul>
-              </div>
-            </details>
-          </div>
-          <a href="#download" class="cta-button">Start Free Trial</a>
         </div>
 
-        <div class="pricing-card">
-          <div class="pricing-header">
-            <h3 style="margin: 0 0 12px; color: var(--node-response);">Pro Monthly</h3>
-            <div class="pricing-price" style="color: var(--node-response);">$8</div>
-            <div class="pricing-period">Billed monthly, cancel anytime</div>
-          </div>
-          <div class="pricing-details">
-            <details class="pricing-details" open>
-              <summary>Everything in Free, plus:</summary>
-              <div class="pricing-details-content">
-                <ul>
-                  <li>Unlimited access—no expiration</li>
-                  <li>All API providers supported simultaneously</li>
-                  <li>Persistent project storage and search</li>
-                  <li>Full plugin ecosystem access</li>
-                  <li>Priority bug fixes and updates</li>
-                  <li>Direct developer support via email</li>
-                  <li>Early access to new features</li>
-                </ul>
+        <div id="pricing-content" class="pricing-content blurred">
+          <div class="pricing-grid">
+            <div class="pricing-card">
+              <div class="pricing-header">
+                <h3 style="margin: 0 0 12px; color: var(--text);">Free Trial</h3>
+                <div class="pricing-price">5 days</div>
+                <div class="pricing-period">Full features, no credit card</div>
               </div>
-            </details>
-          </div>
-          <a href="#download" class="cta-button primary">Upgrade to Pro</a>
-        </div>
-
-        <div class="pricing-card">
-          <div class="pricing-header">
-            <h3 style="margin: 0 0 12px; color: var(--node-query);">Pro Annual</h3>
-            <div class="pricing-price" style="color: var(--node-query);">$65</div>
-            <div class="pricing-period">$5.42/month, save 2 months</div>
-          </div>
-          <div class="pricing-details">
-            <details class="pricing-details" open>
-              <summary>All Pro Monthly benefits</summary>
-              <div class="pricing-details-content">
-                <p>Same unlimited access and support as monthly, with a discounted annual rate. Renews automatically—cancel anytime before renewal.</p>
+              <div class="pricing-details">
+                <details class="pricing-details" open>
+                  <summary>What's included</summary>
+                  <div class="pricing-details-content">
+                    <ul>
+                      <li>Complete node-graph canvas with infinite branching</li>
+                      <li>Local models via Ollama (fully private)</li>
+                      <li>One external API provider (OpenAI, Anthropic, etc.)</li>
+                      <li>Frames, notes, and navigation pins</li>
+                      <li>Temporary session storage (not saved)</li>
+                      <li>Full access to all core features</li>
+                    </ul>
+                  </div>
+                </details>
               </div>
-            </details>
-          </div>
-          <a href="#download" class="cta-button primary">Choose Annual</a>
-        </div>
+              <a href="#download" class="cta-button">Start Free Trial</a>
+            </div>
 
-        <div class="pricing-card founder" style="border-color: var(--accent-orange); border-width: 2px;">
-          <div class="pricing-header" style="background: rgba(245, 158, 11, 0.08);">
-            <h3 style="margin: 0 0 12px; color: var(--accent-orange);">Founders License</h3>
-            <div class="pricing-price" style="color: var(--accent-orange);">$99</div>
-            <div class="pricing-period">One-time payment, lifetime updates</div>
-            <span class="pricing-badge community">Limited availability</span>
-          </div>
-          <div class="pricing-details">
-            <details class="pricing-details" open>
-              <summary>All Pro features, plus exclusive perks</summary>
-              <div class="pricing-details-content">
-                <ul>
-                  <li>Lifetime updates and access—never expires</li>
-                  <li>Exclusive "Founder" community badge in roadmap discussions</li>
-                  <li>Priority consideration for feature requests</li>
-                  <li>Direct line to developer for insights and strategic input</li>
-                  <li>Earliest access to beta features before public release</li>
-                  <li>Recognition in project credits and GitHub contributors</li>
-                  <li>Special pricing on future Graphite products</li>
-                </ul>
-                <p style="margin-top: 16px; color: var(--accent-orange); font-weight: 600;">Only 50 licenses available.</p>
+            <div class="pricing-card">
+              <div class="pricing-header">
+                <h3 style="margin: 0 0 12px; color: var(--node-response);">Pro Monthly</h3>
+                <div class="pricing-price" style="color: var(--node-response);">$8</div>
+                <div class="pricing-period">Billed monthly, cancel anytime</div>
               </div>
-            </details>
-          </div>
-          <a href="#download" class="cta-button" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.2)); border-color: var(--accent-orange); color: var(--accent-orange);">Claim Founders License</a>
-        </div>
+              <div class="pricing-details">
+                <details class="pricing-details" open>
+                  <summary>Everything in Free, plus:</summary>
+                  <div class="pricing-details-content">
+                    <ul>
+                      <li>Unlimited access—no expiration</li>
+                      <li>All API providers supported simultaneously</li>
+                      <li>Persistent project storage and search</li>
+                      <li>Full plugin ecosystem access</li>
+                      <li>Priority bug fixes and updates</li>
+                      <li>Direct developer support via email</li>
+                      <li>Early access to new features</li>
+                    </ul>
+                  </div>
+                </details>
+              </div>
+              <a href="#download" class="cta-button primary">Upgrade to Pro</a>
+            </div>
 
+            <div class="pricing-card">
+              <div class="pricing-header">
+                <h3 style="margin: 0 0 12px; color: var(--node-query);">Pro Annual</h3>
+                <div class="pricing-price" style="color: var(--node-query);">$65</div>
+                <div class="pricing-period">$5.42/month, save 2 months</div>
+              </div>
+              <div class="pricing-details">
+                <details class="pricing-details" open>
+                  <summary>All Pro Monthly benefits</summary>
+                  <div class="pricing-details-content">
+                    <p>Same unlimited access and support as monthly, with a discounted annual rate. Renews automatically—cancel anytime before renewal.</p>
+                  </div>
+                </details>
+              </div>
+              <a href="#download" class="cta-button primary">Choose Annual</a>
+            </div>
+
+            <div class="pricing-card founder" style="border-color: var(--accent-orange); border-width: 2px;">
+              <div class="pricing-header" style="background: rgba(245, 158, 11, 0.08);">
+                <h3 style="margin: 0 0 12px; color: var(--accent-orange);">Founders License</h3>
+                <div class="pricing-price" style="color: var(--accent-orange);">$99</div>
+                <div class="pricing-period">One-time payment, lifetime updates</div>
+                <span class="pricing-badge community">Limited availability</span>
+              </div>
+              <div class="pricing-details">
+                <details class="pricing-details" open>
+                  <summary>All Pro features, plus exclusive perks</summary>
+                  <div class="pricing-details-content">
+                    <ul>
+                      <li>Lifetime updates and access—never expires</li>
+                      <li>Exclusive "Founder" community badge in roadmap discussions</li>
+                      <li>Priority consideration for feature requests</li>
+                      <li>Direct line to developer for insights and strategic input</li>
+                      <li>Earliest access to beta features before public release</li>
+                      <li>Recognition in project credits and GitHub contributors</li>
+                      <li>Special pricing on future Graphite products</li>
+                    </ul>
+                    <p style="margin-top: 16px; color: var(--accent-orange); font-weight: 600;">Only 50 licenses available.</p>
+                  </div>
+                </details>
+              </div>
+              <a href="#download" class="cta-button" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(217, 119, 6, 0.2)); border-color: var(--accent-orange); color: var(--accent-orange);">Claim Founders License</a>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -727,5 +795,12 @@
       </div>
     </footer>
   </main>
+
+  <script>
+    document.getElementById('reveal-pricing-btn').addEventListener('click', function() {
+      document.getElementById('pricing-overlay').classList.add('hidden');
+      document.getElementById('pricing-content').classList.remove('blurred');
+    });
+  </script>
 </body>
 </html>
