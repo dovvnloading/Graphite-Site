@@ -919,9 +919,11 @@
     const TOTAL_CYCLE = PAN_DURATION + FADE_DURATION;
 
     function getRandomPosition() {
-        const x = 40 + Math.random() * 20;
-        const y = 40 + Math.random() * 20;
-        return `${x}% ${y}%`;
+        const margin = 10;
+        const range = 100 - margin * 2;
+        const x = margin + Math.random() * range;
+        const y = margin + Math.random() * range;
+        return `${x.toFixed(2)}% ${y.toFixed(2)}%`;
     }
 
     function showImage(index) {
