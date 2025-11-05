@@ -118,8 +118,38 @@
         font-size: 0.8rem;
         font-weight: 600;
         letter-spacing: 0.5px;
+        cursor: help;
+    }
+    
+    #countdownText {
+        transition: opacity 0.3s ease-in-out;
     }
 
+    #countdownText.fading {
+        opacity: 0;
+    }
+
+    .countdown-timer .tooltip {
+        position: absolute;
+        bottom: 110%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--surface);
+        padding: 6px 10px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        border: 1px solid var(--line);
+    }
+
+    .countdown-timer:hover .tooltip {
+        opacity: 1;
+    }
+    
     .countdown-timer span {
         color: var(--text);
         font-weight: 700;
@@ -657,7 +687,10 @@
         <div class="pan-content" id="panContent"></div>
     </div>
     <div class="overlay"></div>
-    <div class="countdown-timer" id="countdownTimer"></div>
+    <div class="countdown-timer">
+        <div id="countdownText"></div>
+        <span class="tooltip">Estimated. Goal release is around Feb 2026.</span>
+    </div>
     <div class="text-overlay" id="textOverlay"></div>
     <div class="image-indicator" id="imageIndicator"></div>
   </div>
@@ -956,7 +989,9 @@
         'https://github.com/dovvnloading/Graphite-Site/blob/main/Screenshot%202025-11-05%20111825.png?raw=true',
         'https://github.com/dovvnloading/Graphite-Site/blob/main/Screenshot%202025-11-05%20111844.png?raw=true',
         'https://github.com/dovvnloading/Graphite-Site/blob/main/Screenshot%202025-11-05%20111955.png?raw=true',
-        'https://github.com/dovvnloading/Graphite-Site/blob/main/Screenshot%202025-11-05%20112247.png?raw=true'
+        'https://github.com/dovvnloading/Graphite-Site/blob/main/Screenshot%202025-11-05%20112247.png?raw=true',
+        'https://github.com/dovvnloading/Graphite-Site/blob/main/Screenshot%202025-11-05%20135531.png?raw=true',
+        'https://github.com/dovvnloading/Graphite-Site/blob/main/Screenshot%202025-11-05%20135844.png?raw=true'
     ];
 
     const overlayTexts = [
@@ -990,7 +1025,7 @@
     const panContent = document.getElementById('panContent');
     const imageIndicator = document.getElementById('imageIndicator');
     const textOverlay = document.getElementById('textOverlay');
-    const countdownTimer = document.getElementById('countdownTimer');
+    const countdownText = document.getElementById('countdownText');
     
     let imageCycleInterval;
 
@@ -1060,14 +1095,21 @@
     }
 
     function updateCountdown() {
-        const startDate = new Date('2025-11-05T00:00:00Z');
-        const endDate = new Date('2026-02-01T00:00:00Z');
-        const randomTime = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime());
-        const randomDate = new Date(randomTime);
-        const month = randomDate.toLocaleString('en-US', { month: 'short' }).toUpperCase();
-        const day = randomDate.getDate();
-        
-        countdownTimer.innerHTML = `V1.0 LAUNCH EST. <span>${month} ${day}, 2026</span>`;
+        countdownText.classList.add('fading');
+
+        setTimeout(() => {
+            const startDate = new Date('2025-11-05T00:00:00Z');
+            const endDate = new Date('2026-02-01T00:00:00Z');
+            const randomTime = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime());
+            const randomDate = new Date(randomTime);
+            
+            const month = randomDate.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+            const day = randomDate.getDate();
+            const year = randomDate.getFullYear();
+            
+            countdownText.innerHTML = `V1.0 LAUNCH EST. <span>${month} ${day}, ${year}</span>`;
+            countdownText.classList.remove('fading');
+        }, 300); 
     }
 
     // Preload images
