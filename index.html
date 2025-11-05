@@ -5,6 +5,9 @@
   <title>Graphite — The Integrated AI Workspace</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Graphite is a local-first, privacy-respecting AI workspace with a node-graph interface for complex reasoning, research, code execution, and knowledge synthesis." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@900&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #1a1a1a;
@@ -103,57 +106,6 @@
         width: 24px;
         border-radius: 4px;
     }
-
-    .countdown-timer {
-        position: absolute;
-        top: 24px;
-        left: 24px;
-        z-index: 4;
-        background: rgba(0,0,0,0.4);
-        backdrop-filter: blur(4px);
-        padding: 6px 12px;
-        border-radius: 6px;
-        border: 1px solid var(--line);
-        color: var(--text-muted);
-        font-size: 0.8rem;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        cursor: help;
-    }
-    
-    #countdownText {
-        transition: opacity 0.3s ease-in-out;
-    }
-
-    #countdownText.fading {
-        opacity: 0;
-    }
-
-    .countdown-timer .tooltip {
-        position: absolute;
-        bottom: 110%;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--surface);
-        padding: 6px 10px;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        font-weight: 500;
-        white-space: nowrap;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease;
-        border: 1px solid var(--line);
-    }
-
-    .countdown-timer:hover .tooltip {
-        opacity: 1;
-    }
-    
-    .countdown-timer span {
-        color: var(--text);
-        font-weight: 700;
-    }
     
     .text-overlay {
         position: absolute;
@@ -162,6 +114,7 @@
         transform: translateX(-50%);
         z-index: 4;
         color: white;
+        font-family: 'Poppins', sans-serif;
         font-size: clamp(1.5rem, 4vw, 2.5rem);
         font-weight: 900;
         text-shadow: 0 0 10px rgba(0,0,0,0.7), 0 0 20px rgba(0,0,0,0.5);
@@ -170,6 +123,7 @@
         text-align: center;
         pointer-events: none;
         width: 90%;
+        letter-spacing: 0.5px;
     }
 
     .text-overlay.visible {
@@ -687,10 +641,6 @@
         <div class="pan-content" id="panContent"></div>
     </div>
     <div class="overlay"></div>
-    <div class="countdown-timer">
-        <div id="countdownText"></div>
-        <span class="tooltip">Estimated. Goal release is around Feb 2026.</span>
-    </div>
     <div class="text-overlay" id="textOverlay"></div>
     <div class="image-indicator" id="imageIndicator"></div>
   </div>
@@ -1025,7 +975,6 @@
     const panContent = document.getElementById('panContent');
     const imageIndicator = document.getElementById('imageIndicator');
     const textOverlay = document.getElementById('textOverlay');
-    const countdownText = document.getElementById('countdownText');
     
     let imageCycleInterval;
 
@@ -1094,24 +1043,6 @@
         startCycle();
     }
 
-    function updateCountdown() {
-        countdownText.classList.add('fading');
-
-        setTimeout(() => {
-            const startDate = new Date('2025-11-05T00:00:00Z');
-            const endDate = new Date('2026-02-01T00:00:00Z');
-            const randomTime = startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime());
-            const randomDate = new Date(randomTime);
-            
-            const month = randomDate.toLocaleString('en-US', { month: 'short' }).toUpperCase();
-            const day = randomDate.getDate();
-            const year = randomDate.getFullYear();
-            
-            countdownText.innerHTML = `V1.0 LAUNCH EST. <span>${month} ${day}, ${year}</span>`;
-            countdownText.classList.remove('fading');
-        }, 300); 
-    }
-
     // Preload images
     images.forEach(src => {
         const img = new Image();
@@ -1129,8 +1060,6 @@
     // Initial load
     showImage(0);
     startCycle();
-    updateCountdown();
-    setInterval(updateCountdown, 4000);
 
   </script>
 </body>
