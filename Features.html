@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <title>Graphite Pro — Complete Feature List</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Explore the complete feature list of Graphite Pro, the local-first AI workspace." />
+  <meta name="description" content="Explore the complete feature list of Graphite Pro, the local-first AI workspace for reasoning, research, and creation." />
   <style>
     :root {
       --bg: #1a1a1a;
@@ -228,7 +228,7 @@
 
     .feature-tooltip {
       position: absolute;
-      top: -120px;
+      bottom: 105%;
       left: 50%;
       transform: translateX(-50%);
       padding: 12px 16px;
@@ -308,7 +308,7 @@
     <!-- HEADER -->
     <header>
       <h1>Complete Feature List</h1>
-      <p class="lead">Explore every capability that makes Graphite Pro the ultimate visual reasoning workspace.</p>
+      <p class="lead">Explore every capability that makes Graphite the ultimate visual AI workspace.</p>
       <a class="btn btn-primary" href="index.html">← Back to Home</a>
     </header>
 
@@ -317,139 +317,131 @@
       <h2>All Features</h2>
       <div class="feature-list-grid">
         <div class="feature-list-card">
-          <h3>Canvas & Navigation</h3>
+          <h3 style="color: var(--node-query);">Canvas & Navigation</h3>
           <ul>
-            <li>Node-graph canvas for spatial reasoning</li>
-            <li>Pan, zoom, and area zoom controls</li>
-            <li>Frames & Containers for organization</li>
-            <li>Conversation timeline minimap</li>
-            <li>Navigation pins and bookmarks</li>
-            <li>Sticky notes for annotations</li>
-            <li>Dynamic grid with snap, guides &amp; orthogonal routing</li>
+            <li>Infinite Node-Graph Canvas</li>
+            <li>Pan (Middle Mouse, WASD) & Zoom (Ctrl+Wheel, Q/E)</li>
+            <li>Area Zoom (Shift+Drag)</li>
+            <li>Conversation Timeline Minimap</li>
+            <li>Navigation Pins & Bookmarks</li>
+            <li>Sticky Notes for Annotations (Ctrl+N)</li>
+            <li>Dynamic Grid with Snap-to-Grid</li>
+            <li>Smart Alignment Guides</li>
+            <li>Orthogonal Connection Routing</li>
           </ul>
-          <div class="feature-tooltip">Organize your thinking spatially with an intuitive canvas that supports grouping with Frames and Containers, bookmarking, a conversation minimap, and visual alignment tools.</div>
+          <div class="feature-tooltip">Organize thinking spatially. Group with Frames and Containers, bookmark locations, and align items with a dynamic grid and smart guides.</div>
         </div>
         <div class="feature-list-card">
           <h3>Content & Nodes</h3>
           <ul>
-            <li>Chat nodes with multi-modal support</li>
-            <li>Conversation Nodes for encapsulated sub-tasks</li>
-            <li>Markdown formatting and images</li>
-            <li>Code nodes with syntax highlighting</li>
-            <li>Document nodes for file content</li>
-            <li>Contextual branching from any point</li>
-            <li>Response regeneration</li>
-            <li>Scrollable and collapsible content</li>
+            <li>Multi-modal Chat Nodes (Text, Images, Docs)</li>
+            <li>Code Nodes with Syntax Highlighting</li>
+            <li>Image & Document Attachment Nodes</li>
+            <li>Contextual Branching from Any Node</li>
+            <li>AI Response Regeneration</li>
+            <li>Scrollable & Collapsible Node Content</li>
+            <li>Full Markdown Rendering</li>
+            <li>Document Viewer Panel for Focused Reading</li>
           </ul>
-          <div class="feature-tooltip">Create and manipulate different node types to represent conversations, code snippets, and document references with full formatting support.</div>
+          <div class="feature-tooltip">Create diverse content types, from markdown-rich text to code blocks and file attachments, all visually organized on the canvas.</div>
+        </div>
+        <div class="feature-list-card">
+          <h3 style="color: var(--node-analysis);">Knowledge Synthesis</h3>
+          <ul>
+            <li>Generate Key Takeaway (Single Node)</li>
+            <li>Generate Explainer (Single Node)</li>
+            <li>**Generate Group Summary (Multi-Node)**</li>
+            <li>Visual Connections to Summary Sources</li>
+            <li>AI-Powered Chart & Graph Generation (5+ Types)</li>
+            <li>Image Generation from Text Prompts</li>
+            <li>Custom System Prompts per Branch</li>
+          </ul>
+          <div class="feature-tooltip">Turn raw information into insight. Summarize single nodes, synthesize multiple nodes into a cohesive overview, and visualize data on the fly.</div>
+        </div>
+        <div class="feature-list-card">
+          <h3 style="color: var(--accent-orange);">Plugins & Extensibility</h3>
+          <ul>
+            <li>**Py-Coder:** AI-driven & Manual Code Execution</li>
+            <li>**graphite-Web:** Context-Aware Web Research</li>
+            <li>**Reasoning Engine:** Multi-step Problem Solving</li>
+            <li>**Conversation Node:** Encapsulated Sub-chats</li>
+            <li>Plugin Architecture for Custom Tools</li>
+            <li>Command Palette for Full Access (Ctrl+K)</li>
+          </ul>
+          <div class="feature-tooltip">Extend Graphite with powerful plugins like a code interpreter (Py-Coder), a web researcher, a reasoning engine, and more.</div>
         </div>
         <div class="feature-list-card">
           <h3>Connections & Relationships</h3>
           <ul>
-            <li>Conversation flow visualization</li>
-            <li>Ancestor path animation on hover</li>
-            <li>Custom path routing with pins</li>
-            <li>Bezier curve control points</li>
-            <li>Content links between nodes</li>
-            <li>System prompt connections</li>
-            <li>Orthogonal routing option</li>
-            <li>Color-coded branches</li>
+            <li>Visual Conversation Flow</li>
+            <li>Ancestor Path Animation on Hover</li>
+            <li>Custom Path Routing with Pins (Ctrl+Click)</li>
+            <li>Distinct Styles for All Connection Types</li>
+            <li>Support for Branching & Merging Concepts</li>
+            <li>Auto-Updating Paths on Node Move</li>
           </ul>
-          <div class="feature-tooltip">Visualize relationships between nodes with customizable paths and connections that help clarify your reasoning flow.</div>
+          <div class="feature-tooltip">Visualize how ideas connect with animated, customizable, and stylistically distinct lines that clarify your reasoning flow.</div>
         </div>
         <div class="feature-list-card">
-          <h3>AI & Analysis</h3>
+          <h3>File & Data Management</h3>
           <ul>
-            <li>Multi-provider support (5+ services)</li>
-            <li>Context-aware web search & validation</li>
-            <li>Run workflows across all models</li>
-            <li>AI chart generation (5 types)</li>
-            <li>Image generation from prompts</li>
-            <li>Generate takeaways and explainers</li>
-            <li>Custom system prompts per branch</li>
-            <li>Role-based AI behavior</li>
-          </ul>
-          <div class="feature-tooltip">Leverage AI to generate content, analyze data, create visualizations, and perform web-grounded research. Explore multiple reasoning paths with different models.</div>
-        </div>
-        <div class="feature-list-card">
-          <h3>File & Content</h3>
-          <ul>
-            <li>Drag-and-drop file attachment</li>
-            <li>Image formats (PNG, JPG, WebP)</li>
-            <li>11+ document formats supported</li>
-            <li>Automatic text extraction</li>
-            <li>Export nodes to PDF, DOCX, MD, and more</li>
-            <li>Multi-modal prompt support</li>
-            <li>Full-text search across canvas</li>
+            <li>Drag-and-Drop File Attachments</li>
+            <li>Support for Images (PNG, JPG) & Docs (PDF, DOCX, TXT...)</li>
+            <li>Automatic Text Extraction from Files</li>
+            <li>Export Nodes to PDF, DOCX, MD, HTML, & TXT</li>
+            <li>Copy Text, Code, or Images to Clipboard</li>
+            <li>Full-Text Search Across Entire Canvas (Ctrl+F)</li>
           </ul>
           <div class="feature-tooltip">Attach and process files directly in your workspace. Export any content to standard formats, with automatic parsing and searchable content indexing.</div>
         </div>
         <div class="feature-list-card">
-          <h3>Session & Knowledge</h3>
+          <h3>Session & Knowledge Base</h3>
           <ul>
-            <li>Chat library for all sessions</li>
-            <li>Load, delete, rename, search</li>
-            <li>Manual save with Ctrl+S</li>
-            <li>Full state preservation</li>
-            <li>Local SQLite database</li>
-            <li>Auto-generated titles</li>
-            <li>Zero cloud dependency</li>
+            <li>Chat Library for All Sessions</li>
+            <li>Load, Delete, Rename & Search Sessions</li>
+            <li>Full State Preservation (incl. view state)</li>
+            <li>Local SQLite Database Storage</li>
+            <li>AI-Generated Titles for New Chats</li>
+            <li>No Cloud Dependency for Data</li>
           </ul>
-          <div class="feature-tooltip">Save and manage all your work locally with automatic session titling and complete state recovery including zoom levels and scroll positions.</div>
+          <div class="feature-tooltip">Save and manage your work as a persistent knowledge base. All sessions are stored locally, searchable, and fully restorable.</div>
         </div>
         <div class="feature-list-card">
-          <h3>Configuration & Models</h3>
+          <h3>Model & Provider Configuration</h3>
           <ul>
-            <li>Ollama local model execution</li>
-            <li>OpenAI, Anthropic, Gemini, Groq</li>
-            <li>API key management</li>
-            <li>Model-task specific routing</li>
-            <li>OpenAI-compatible endpoints</li>
-            <li>Flexible base URL config</li>
-            <li>Provider switching</li>
+            <li>**Local-First:** Ollama for offline use</li>
+            <li>**API Support:** OpenAI, Anthropic, Gemini, Groq</li>
+            <li>Support for any OpenAI-Compatible Endpoint</li>
+            <li>Model-per-Task Routing in Settings</li>
+            <li>API Key & Base URL Management</li>
+            <li>On-the-fly Provider Switching</li>
           </ul>
-          <div class="feature-tooltip">Connect to any AI provider with flexible configuration and assign different models for different tasks based on your needs.</div>
+          <div class="feature-tooltip">Connect to any AI provider. Use local models for privacy or powerful APIs for frontier performance, and assign different models to different tasks.</div>
         </div>
         <div class="feature-list-card">
-          <h3>UI & Experience</h3>
+          <h3>Organization & UI</h3>
           <ul>
-            <li>Command palette with Ctrl+K</li>
-            <li>Search overlay with Ctrl+F</li>
-            <li>Context menus for actions</li>
-            <li>Customizable canvas settings</li>
-            <li>Grid and font adjustments</li>
-            <li>Dark theme optimized</li>
-            <li>Complete keyboard shortcuts</li>
-            <li>Context-aware keyboard shortcuts</li>
+            <li>Frames (Ctrl+G) & Containers (Ctrl+Shift+G)</li>
+            <li>Auto-Organize Tree Layout</li>
+            <li>Collapsible Nodes & Containers</li>
+            <li>Customizable Frame & Note Colors</li>
+            <li>Dark & Monochromatic Themes</li>
+            <li>Keyboard-First Navigation (WASD, Arrows)</li>
+            <li>Context-Aware Keyboard Shortcuts</li>
           </ul>
-          <div class="feature-tooltip">Access all features via the Command Palette, search overlay, context menus, and keyboard shortcuts. Customize your workspace with on-canvas controls.</div>
-        </div>
-        <div class="feature-list-card">
-          <h3>Plugins & Extensibility</h3>
-          <ul>
-            <li>Plugin architecture framework</li>
-            <li>Web Search Plugin (graphite-Web)</li>
-            <li>Conversation Node Plugin</li>
-            <li>Py-Coder Plugin with code execution</li>
-            <li>System Prompt Plugin</li>
-            <li>Data visualization tools</li>
-            <li>Custom integrations</li>
-            <li>API for developers</li>
-          </ul>
-          <div class="feature-tooltip">Extend Graphite with powerful plugins like Py-Coder (code execution), graphite-Web (web search), Conversation Nodes, a System Prompt editor, and more.</div>
+          <div class="feature-tooltip">Structure your canvas with powerful grouping tools, automatic layouts, and extensive customization options for a personalized workflow.</div>
         </div>
         <div class="feature-list-card">
           <h3>Licensing & Privacy</h3>
           <ul>
-            <li>5-day free trial, no card needed</li>
-            <li>Offline activation</li>
-            <li>Zero telemetry or tracking</li>
-            <li>Fully offline operation mode</li>
-            <li>Complete data ownership</li>
-            <li>Direct developer support</li>
-            <li>Independence and reliability</li>
+            <li>5-Day Full-Feature Free Trial</li>
+            <li>One-Time Offline Activation</li>
+            <li>Zero Telemetry or Tracking</li>
+            <li>Fully Offline Operation Possible</li>
+            <li>Complete Data Ownership (Local-First)</li>
+            <li>Direct Developer Support for Pro Users</li>
           </ul>
-          <div class="feature-tooltip">Activate once and work forever with complete privacy, no tracking, and the ability to work entirely offline on your own device.</div>
+          <div class="feature-tooltip">Activate once and work with complete privacy. Your data and workflows are never tracked or sent to the cloud unless you explicitly use an API.</div>
         </div>
       </div>
     </section>
